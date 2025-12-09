@@ -1,0 +1,46 @@
+═══════════════════════════════════════════════════════════════
+  JEAN CHOCOLATIER - INSTRUCTIONS DE DÉMARRAGE
+═══════════════════════════════════════════════════════════════
+
+Pour démarrer le site, ouvrez un terminal et exécutez :
+
+  python3 server.py
+
+OU
+
+  ./start.sh
+
+Le site sera alors accessible sur :
+  
+  http://localhost:3000
+
+Ouvrez cette adresse dans Google Chrome pour voir votre site.
+
+═══════════════════════════════════════════════════════════════
+
+CONFIGURATION EMAIL (Optionnel) :
+
+Pour recevoir les emails de commandes et de contact :
+
+1. Allez dans votre compte Google > Sécurité
+2. Activez la validation en 2 étapes
+3. Créez un mot de passe d'application
+4. Dans le terminal, avant de démarrer le serveur :
+   
+   export EMAIL_PASSWORD=votre_mot_de_passe_application
+
+Sans cette configuration, les messages s'afficheront dans la 
+console mais ne seront pas envoyés par email.
+
+═══════════════════════════════════════════════════════════════
+
+FONCTIONNALITÉS :
+
+✓ Page d'accueil avec 6 produits
+✓ Panier avec gestion des quantités
+✓ Formulaire de commande
+✓ Page de contact avec envoi d'email
+✓ Design blanc/beige avec atmosphère gourmande
+
+═══════════════════════════════════════════════════════════════
+

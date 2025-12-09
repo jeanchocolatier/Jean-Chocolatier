@@ -1,0 +1,36 @@
+═══════════════════════════════════════════════════════════════
+  MODIFICATIONS EFFECTUÉES
+═══════════════════════════════════════════════════════════════
+
+✅ TRUFFES AU CHOCOLAT NOIR - Options de quantité :
+   - 5 Truffes : 4,00 €
+   - 10 Truffes : 14,00 €
+   - 15 Truffes : 20,00 €
+   - 20 Truffes : 25,00 €
+   
+   Le prix s'adapte automatiquement selon le nombre choisi.
+
+✅ IMAGES DES PRODUITS :
+   - Tous les emojis ont été remplacés par des images
+   - Fichiers créés (à remplacer par vos vraies photos) :
+     * produit-1-tablette-praline.jpg
+     * produit-2-truffes.jpg
+     * produit-3-pate-tartiner.jpg
+     * produit-4-tablette-lettre.jpg
+     * produit-5-tablette-decoree.jpg
+     * produit-6-tablette-classique.jpg
+
+✅ LOGO :
+   - Le logo est configuré pour accepter logo.png ou logo.jpg
+   - Placez votre logo dans le dossier avec l'un de ces noms
+   - "Jean Chocolatier" reste bien à droite du logo
+   - Le logo est cliquable pour retourner à l'accueil
+
+═══════════════════════════════════════════════════════════════
+
+Pour voir le site :
+  python3 -m http.server 8080
+  Puis ouvrez : http://127.0.0.1:8080
+
+═══════════════════════════════════════════════════════════════
+

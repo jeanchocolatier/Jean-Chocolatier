@@ -1,0 +1,22 @@
+═══════════════════════════════════════════════════════════════
+  COMMENT AJOUTER VOTRE LOGO
+═══════════════════════════════════════════════════════════════
+
+Pour ajouter votre logo "Jean Chocolatier" :
+
+1. Placez votre fichier logo dans ce dossier avec l'un de ces noms :
+   - logo.png
+   - logo.jpg
+   - logo.jpeg
+
+2. Le logo s'affichera automatiquement à gauche de "Jean Chocolatier"
+
+3. Format recommandé :
+   - Format : PNG (transparent) ou JPG
+   - Taille : 60x60 pixels ou plus (le site l'ajustera)
+   - Fond transparent recommandé pour PNG
+
+4. Le logo est cliquable et ramène à la page d'accueil
+
+═══════════════════════════════════════════════════════════════
+

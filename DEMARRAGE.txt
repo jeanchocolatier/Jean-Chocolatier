@@ -2,12 +2,21 @@
   JEAN CHOCOLATIER - INSTRUCTIONS DE DÉMARRAGE
 ═══════════════════════════════════════════════════════════════
 
-Pour démarrer le site, ouvrez un terminal et exécutez :
+OPTION 1 : Node.js (Recommandé) ⭐
+  Node.js v24.12.0 détecté ✅
+
+  npm start
+  
+  OU
+  
+  ./start-node.sh
+
+OPTION 2 : Python
 
   python3 server.py
-
-OU
-
+  
+  OU
+  
   ./start.sh
 
 Le site sera alors accessible sur :

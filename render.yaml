@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jean-chocolatier
+    env: node
+    plan: free
+    # IMPORTANT: Ce doit être un "Web Service", PAS un "Static Site"
+    # Root directory : laissez vide (.) si votre dépôt Git est dans ce dossier
+    rootDir: .
+    # Forcer l'utilisation de npm au lieu de yarn
+    # Utiliser npm install au lieu de npm ci pour éviter les problèmes de lockfile
+    buildCommand: npm install
+    startCommand: npm start
+    # S'assurer que c'est un serveur qui tourne (pas un site statique)
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: EMAIL_PASSWORD
+        sync: false  # À configurer manuellement dans le dashboard Render
+

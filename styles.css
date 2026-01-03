@@ -577,10 +577,83 @@ nav {
 
 
 
+.message-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    display: block;
+}
+
 .message-status.error {
     background-color: #f8d7da;
     color: #721c24;
     display: block;
+}
+
+/* Page de contrôle */
+.controle-section {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 3rem;
+    box-shadow: 0 4px 15px var(--shadow);
+}
+
+.controle-section h1 {
+    font-size: 2.5rem;
+    color: var(--brown-dark);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.controle-tables {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.controle-table-container h2 {
+    font-size: 1.8rem;
+    color: var(--brown-dark);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.controle-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    font-size: 0.95rem;
+}
+
+.controle-table thead {
+    background-color: var(--brown);
+    color: var(--white);
+}
+
+.controle-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid var(--brown-dark);
+}
+
+.controle-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--beige);
+}
+
+.controle-table tbody tr:hover {
+    background-color: var(--beige-light);
+}
+
+.controle-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* Responsive */
@@ -605,6 +678,129 @@ nav {
 
     .brand-name {
         font-size: 1.5rem;
+    }
+}
+
+
+
+.controle-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.controle-table th {
+    background-color: var(--beige);
+    color: var(--brown-dark);
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid var(--beige-dark);
+}
+
+.controle-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--beige);
+    color: var(--text-dark);
+}
+
+.controle-table tr:hover {
+    background-color: var(--beige-light);
+}
+
+/* Modal de connexion */
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-modal-content {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.login-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-modal-header h2 {
+    color: var(--brown-dark);
+    font-size: 1.8rem;
+}
+
+.close-login-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-login-modal:hover {
+    color: var(--brown);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.login-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .cart-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .brand-name {
+        font-size: 1.5rem;
+    }
+
+    .controle-table {
+        font-size: 0.9rem;
+    }
+
+    .controle-table th,
+    .controle-table td {
+        padding: 0.5rem;
     }
 }
 

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Site commercial pour Jean Chocolatier",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
@@ -19,4 +23,5 @@
     "cors": "^2.8.5"
   }
 }
+
 

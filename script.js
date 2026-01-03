@@ -60,7 +60,31 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     setupCartEvents();
     loadCartCount();
+    checkAdminLogin();
 });
+
+// Vérifier si l'admin est connecté et afficher/masquer le lien Contrôle
+function checkAdminLogin() {
+    const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+    const controleLink = document.getElementById('controleLink');
+    const loginLink = document.getElementById('loginLink');
+    
+    if (controleLink) {
+        controleLink.style.display = isLoggedIn ? 'block' : 'none';
+    }
+    
+    if (loginLink) {
+        loginLink.href = isLoggedIn ? '#' : 'login.html';
+        if (isLoggedIn) {
+            loginLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Déconnexion';
+            loginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('adminLoggedIn');
+                window.location.reload();
+            });
+        }
+    }
+}
 
 // Afficher les produits
 function renderProducts() {
@@ -351,16 +375,104 @@ function handleOrderSubmit(e) {
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
         address: document.getElementById('address').value,
+        comments: document.getElementById('comments') ? document.getElementById('comments').value : '',
         cart: cart,
         total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     };
 
-    // Créer le contenu de l'email
-    const cartItems = cart.map(item => 
+    // Désactiver le bouton pendant l'envoi
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton ? submitButton.textContent : 'Valider la commande';
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Traitement en cours...';
+    }
+
+    // Créer le contenu détaillé de l'email avec prix de chaque article
+    const cartItemsDetails = cart.map(item => {
+        const itemTotal = (item.price * item.quantity).toFixed(2);
+        return `${item.name}\n  Quantité: ${item.quantity}\n  Prix unitaire: ${item.price.toFixed(2)} €\n  Prix total: ${itemTotal} €`;
+    }).join('\n\n');
+
+    const cartItemsSummary = cart.map(item => 
         `${item.name} (x${item.quantity}) : ${(item.price * item.quantity).toFixed(2)} €`
     ).join('\n');
 
-    const emailBody = `Nouvelle commande de ${formData.firstName} ${formData.lastName}
+    // Préparer les paramètres pour EmailJS
+    const emailParams = {
+        customer_name: `${formData.firstName} ${formData.lastName}`,
+        customer_email: formData.email,
+        customer_address: formData.address,
+        customer_comments: formData.comments || 'Aucun commentaire',
+        order_items: cartItemsDetails,
+        order_summary: cartItemsSummary,
+        order_total: formData.total.toFixed(2) + ' €',
+        to_email: 'chezcapucineetjean.2022@gmail.com'
+    };
+
+    // Stocker la commande dans localStorage pour la page de contrôle
+    const orderData = {
+        date: new Date().toISOString(),
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        address: formData.address,
+        comments: formData.comments || '',
+        cart: JSON.parse(JSON.stringify(cart)), // Copie profonde
+        total: formData.total
+    };
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push(orderData);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    // Envoyer via EmailJS
+    emailjs.send('service_order', 'template_order', emailParams)
+        .then(function(response) {
+            console.log('EmailJS SUCCESS!', response.status, response.text);
+            
+            // Afficher le message de succès dans le modal
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                // Créer un élément de message de succès
+                const successDiv = document.createElement('div');
+                successDiv.className = 'order-success-message';
+                successDiv.style.cssText = 'background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; text-align: center; font-weight: bold;';
+                successDiv.textContent = 'Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !';
+                
+                // Insérer le message au début du formulaire
+                const form = modalContent.querySelector('.order-form');
+                if (form) {
+                    form.insertBefore(successDiv, form.firstChild);
+                } else {
+                    modalContent.insertBefore(successDiv, modalContent.firstChild);
+                }
+                
+                // Fermer le modal après 3 secondes
+                setTimeout(() => {
+                    closeOrderModal();
+                    cart = [];
+                    saveCart();
+                    updateCartCount();
+                    renderCartItems();
+                    e.target.reset();
+                }, 3000);
+            } else {
+                alert('Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !');
+                cart = [];
+                saveCart();
+                updateCartCount();
+                closeOrderModal();
+                renderCartItems();
+                e.target.reset();
+            }
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
+        }, function(error) {
+            console.error('EmailJS FAILED...', error);
+            // Essayer d'envoyer au serveur en secours
+            const emailBody = `Nouvelle commande de ${formData.firstName} ${formData.lastName}
 
 Client:
 - Nom: ${formData.firstName} ${formData.lastName}
@@ -368,51 +480,59 @@ Client:
 - Adresse: ${formData.address}
 
 Commande:
-${cartItems}
+${cartItemsSummary}
 
 Total: ${formData.total.toFixed(2)} €`;
 
-    // Essayer d'envoyer au serveur, sinon utiliser mailto
-    fetch('/api/order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Serveur non disponible');
-    })
-    .then(data => {
-        if (data.success) {
-            alert('Commande validée avec succès ! Merci pour votre achat.');
-            cart = [];
-            saveCart();
-            updateCartCount();
-            closeOrderModal();
-            renderCartItems();
-            e.target.reset();
-        } else {
-            throw new Error('Erreur serveur');
-        }
-    })
-    .catch(error => {
-        // Solution de secours : utiliser mailto
-        const subject = encodeURIComponent(`Nouvelle commande de ${formData.firstName} ${formData.lastName}`);
-        const body = encodeURIComponent(emailBody);
-        window.location.href = `mailto:jean.chocolatier.site@gmail.com?subject=${subject}&body=${body}`;
-        
-        alert('Commande validée ! Votre client de messagerie va s\'ouvrir pour confirmer l\'envoi. Si aucune fenêtre ne s\'ouvre, copiez les informations de la commande.');
-        
-        cart = [];
-        saveCart();
-        updateCartCount();
-        closeOrderModal();
-        renderCartItems();
-        e.target.reset();
-    });
+            fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Serveur non disponible');
+            })
+            .then(data => {
+                if (data.success) {
+                    if (orderMessageStatus) {
+                        orderMessageStatus.textContent = 'Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !';
+                        orderMessageStatus.className = 'message-status success';
+                    }
+                    cart = [];
+                    saveCart();
+                    updateCartCount();
+                    closeOrderModal();
+                    renderCartItems();
+                    e.target.reset();
+                } else {
+                    throw new Error('Erreur serveur');
+                }
+            })
+            .catch(error => {
+                // Solution de secours finale : utiliser mailto
+                const subject = encodeURIComponent(`Nouvelle commande de ${formData.firstName} ${formData.lastName}`);
+                const body = encodeURIComponent(emailBody);
+                window.location.href = `mailto:chezcapucineetjean.2022@gmail.com?subject=${subject}&body=${body}`;
+                
+                alert('Commande validée ! Votre client de messagerie va s\'ouvrir pour confirmer l\'envoi.');
+                cart = [];
+                saveCart();
+                updateCartCount();
+                closeOrderModal();
+                renderCartItems();
+                e.target.reset();
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                }
+            });
+        });
 }
 

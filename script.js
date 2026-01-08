@@ -2,8 +2,8 @@
 const products = [
     {
         id: 1,
-        name: "Tablette Praliné au Chocolat Noir",
-        description: "Découvrez notre nouvelle tablette au chocolat praliné Édition Limitée. À l' intérieur de cette tablette, vous trouverez une délicieuse couche de praliné noisette & amande avec ses croquantes crêpes dentelles qui donnent du croustillant à la tablette. Cette tablettes est sans sucres ajoutés !",
+        name: "Tablette Pralinée au Chocolat Noir",
+        description: "Découvrez notre nouvelle tablette au chocolat praliné Édition Limitée. À l' intérieur de cette tablette, vous trouverez une délicieuse couche de praliné noisette & amande avec ses croquantes crêpes dentelles qui donnent du croustillant à la tablette. Cette tablette est sans sucres ajoutés !",
         price: 4.80,
         image: "produit-1-tablette-praline.jpg"
     },
@@ -30,16 +30,16 @@ const products = [
     },
     {
         id: 4,
-        name: "Tablette au Chocolat Noir en forme d'une lettre",
-        description: "Cette tablette prend la forme de la première lettre de votre prénom. Merci d'indiquer cette lettre dans votre commande.",
-        price: 3.50,
+        name: "Plaque de Chocolat Noir en forme d'une lettre",
+        description: "Cette plaque prend la forme de la lettre de votre choix. Merci d'indiquer cette lettre dans votre commande.",
+        price: 4.00,
         image: "produit-4-tablette-lettre.jpg"
     },
     {
         id: 5,
         name: "Tablette au Chocolat Noir décorée d'une lettre",
-        description: "Sur cette tablette de chocolat noir est dessinée à l'aide de chocolat blanc la première lettre de votre prénom. Merci d'indiquer cette lettre dans votre commande.",
-        price: 3.60,
+        description: "Sur cette tablette de chocolat noir est dessinée à l'aide de chocolat blanc la lettre de votre choix. Merci d'indiquer cette lettre dans votre commande.",
+        price: 3.80,
         image: "produit-5-tablette-decoree.jpg"
     },
     {
@@ -60,31 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     setupCartEvents();
     loadCartCount();
-    checkAdminLogin();
 });
-
-// Vérifier si l'admin est connecté et afficher/masquer le lien Contrôle
-function checkAdminLogin() {
-    const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-    const controleLink = document.getElementById('controleLink');
-    const loginLink = document.getElementById('loginLink');
-    
-    if (controleLink) {
-        controleLink.style.display = isLoggedIn ? 'block' : 'none';
-    }
-    
-    if (loginLink) {
-        loginLink.href = isLoggedIn ? '#' : 'login.html';
-        if (isLoggedIn) {
-            loginLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Déconnexion';
-            loginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('adminLoggedIn');
-                window.location.reload();
-            });
-        }
-    }
-}
 
 // Afficher les produits
 function renderProducts() {
@@ -375,7 +351,6 @@ function handleOrderSubmit(e) {
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
         address: document.getElementById('address').value,
-        comments: document.getElementById('comments') ? document.getElementById('comments').value : '',
         cart: cart,
         total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     };
@@ -403,68 +378,23 @@ function handleOrderSubmit(e) {
         customer_name: `${formData.firstName} ${formData.lastName}`,
         customer_email: formData.email,
         customer_address: formData.address,
-        customer_comments: formData.comments || 'Aucun commentaire',
         order_items: cartItemsDetails,
         order_summary: cartItemsSummary,
         order_total: formData.total.toFixed(2) + ' €',
         to_email: 'chezcapucineetjean.2022@gmail.com'
     };
 
-    // Stocker la commande dans localStorage pour la page de contrôle
-    const orderData = {
-        date: new Date().toISOString(),
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        address: formData.address,
-        comments: formData.comments || '',
-        cart: JSON.parse(JSON.stringify(cart)), // Copie profonde
-        total: formData.total
-    };
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    orders.push(orderData);
-    localStorage.setItem('orders', JSON.stringify(orders));
-    
     // Envoyer via EmailJS
     emailjs.send('service_order', 'template_order', emailParams)
         .then(function(response) {
             console.log('EmailJS SUCCESS!', response.status, response.text);
-            
-            // Afficher le message de succès dans le modal
-            const modalContent = document.querySelector('.modal-content');
-            if (modalContent) {
-                // Créer un élément de message de succès
-                const successDiv = document.createElement('div');
-                successDiv.className = 'order-success-message';
-                successDiv.style.cssText = 'background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; text-align: center; font-weight: bold;';
-                successDiv.textContent = 'Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !';
-                
-                // Insérer le message au début du formulaire
-                const form = modalContent.querySelector('.order-form');
-                if (form) {
-                    form.insertBefore(successDiv, form.firstChild);
-                } else {
-                    modalContent.insertBefore(successDiv, modalContent.firstChild);
-                }
-                
-                // Fermer le modal après 3 secondes
-                setTimeout(() => {
-                    closeOrderModal();
-                    cart = [];
-                    saveCart();
-                    updateCartCount();
-                    renderCartItems();
-                    e.target.reset();
-                }, 3000);
-            } else {
-                alert('Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !');
-                cart = [];
-                saveCart();
-                updateCartCount();
-                closeOrderModal();
-                renderCartItems();
-                e.target.reset();
-            }
+            alert('Commande validée avec succès ! Merci pour votre achat.');
+            cart = [];
+            saveCart();
+            updateCartCount();
+            closeOrderModal();
+            renderCartItems();
+            e.target.reset();
             if (submitButton) {
                 submitButton.disabled = false;
                 submitButton.textContent = originalButtonText;
@@ -499,10 +429,7 @@ Total: ${formData.total.toFixed(2)} €`;
             })
             .then(data => {
                 if (data.success) {
-                    if (orderMessageStatus) {
-                        orderMessageStatus.textContent = 'Merci pour votre commande ! Vous allez recevoir un email de confirmation. À bientôt !';
-                        orderMessageStatus.className = 'message-status success';
-                    }
+                    alert('Commande validée avec succès ! Merci pour votre achat.');
                     cart = [];
                     saveCart();
                     updateCartCount();

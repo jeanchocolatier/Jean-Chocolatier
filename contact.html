@@ -24,12 +24,6 @@
             <nav>
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="contact.html" class="nav-link active">Contact</a>
-                <a href="controle.html" class="nav-link" id="controleLink" style="display: none;">
-                    <i class="fas fa-cog"></i> Contrôle
-                </a>
-                <a href="#" class="nav-link" id="loginLink">
-                    <i class="fas fa-user"></i> Connexion
-                </a>
                 <div class="cart-icon-container">
                     <a href="index.html" class="cart-icon">
                         <i class="fas fa-shopping-cart"></i>
@@ -70,31 +64,8 @@
         </section>
     </main>
 
-    <script src="auth.js"></script>
     <script src="script.js"></script>
     <script src="contact.js"></script>
-    <script>
-        // Vérifier la connexion admin pour afficher le lien Contrôle
-        document.addEventListener('DOMContentLoaded', () => {
-            const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-            const controleLink = document.getElementById('controleLink');
-            const loginLink = document.getElementById('loginLink');
-            
-            if (controleLink) {
-                controleLink.style.display = isLoggedIn ? 'block' : 'none';
-            }
-            
-            if (loginLink && isLoggedIn) {
-                loginLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Déconnexion';
-                loginLink.href = '#';
-                loginLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    localStorage.removeItem('adminLoggedIn');
-                    window.location.reload();
-                });
-            }
-        });
-    </script>
 </body>
 </html>
 

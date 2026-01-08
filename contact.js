@@ -47,23 +47,11 @@ function handleContactSubmit(e) {
         to_email: 'chezcapucineetjean.2022@gmail.com'
     };
 
-    // Sauvegarder le message dans localStorage pour la page de contrôle
-    const contactData = {
-        date: new Date().toISOString(),
-        name: formData.name,
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message
-    };
-    const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-    contacts.push(contactData);
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-
     // Envoyer via EmailJS
     emailjs.send('service_contact', 'template_contact', emailParams)
         .then(function(response) {
             console.log('EmailJS SUCCESS!', response.status, response.text);
-            messageStatus.textContent = 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.';
+            messageStatus.textContent = 'Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.';
             messageStatus.className = 'message-status success';
             contactForm.reset();
             submitButton.disabled = false;
@@ -86,7 +74,7 @@ function handleContactSubmit(e) {
             })
             .then(data => {
                 if (data.success) {
-                    messageStatus.textContent = 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.';
+                    messageStatus.textContent = 'Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.';
                     messageStatus.className = 'message-status success';
                     contactForm.reset();
                 } else {

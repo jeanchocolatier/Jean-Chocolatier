@@ -3,14 +3,14 @@ const products = [
     {
         id: 1,
         name: "Tablette Pralinée au Chocolat Noir",
-        description: "Découvrez notre nouvelle tablette au chocolat praliné Édition Limitée. À l' intérieur de cette tablette, vous trouverez une délicieuse couche de praliné noisette & amande avec ses croquantes crêpes dentelles qui donnent du croustillant à la tablette. Cette tablette est sans sucres ajoutés !",
+        description: "Découvrez notre nouvelle tablette au chocolat praliné Édition Limitée. À l'intérieur de cette tablette, vous trouverez une délicieuse couche de praliné noisette et amande avec ses croquantes crêpes dentelles, qui donnent du croustillant à la tablette. Cette tablette est sans sucres ajoutés ! Elle est également disponible au chocolat au lait.",
         price: 4.80,
         image: "produit-1-tablette-praline.jpg"
     },
     {
         id: 2,
         name: "Truffes au Chocolat Noir",
-        description: "Découvrez nos Truffes au Chocolat Noir, préparées avec des ingrédients de qualité supérieure.",
+        description: "Découvrez nos Truffes au Chocolat Noir, à la texture fondante en bouche.",
         price: 7.50, // Prix par défaut (sera remplacé par les options)
         image: "produit-2-truffes.jpg",
         isTruffes: true, // Indicateur spécial pour les truffes
@@ -24,28 +24,28 @@ const products = [
     {
         id: 3,
         name: "Pâte à tartiner",
-        description: "Découvrez notre délicieuse pâte à tartiner créée à base de seulement 3 ingrédients : du chocolat, des noisettes & des amandes. Elle se conserve 2 semaines. SANS SUCRES AJOUTÉS !",
+        description: "Découvrez notre délicieuse pâte à tartiner créée à base de 3 ingrédients seulement : du chocolat, des noisettes, et des amandes. Elle se conserve 2 semaines. Sans sucres ajoutés !",
         price: 5.00,
         image: "produit-3-pate-tartiner.jpg"
     },
     {
         id: 4,
         name: "Plaque de Chocolat Noir en forme d'une lettre",
-        description: "Cette plaque prend la forme de la lettre de votre choix. Merci d'indiquer cette lettre dans votre commande.",
+        description: "Cette plaque de chocolat prend la forme d'une lettre de votre choix. Merci d'indiquer cette lettre lors de votre commande. Cette plaque est également est disponible au chocolat au lait.",
         price: 4.00,
         image: "produit-4-tablette-lettre.jpg"
     },
     {
         id: 5,
         name: "Tablette au Chocolat Noir décorée d'une lettre",
-        description: "Sur cette tablette de chocolat noir est dessinée à l'aide de chocolat blanc la lettre de votre choix. Merci d'indiquer cette lettre dans votre commande.",
+        description: "Sur cette tablette de chocolat est dessinée la lettre de votre choix, en chocolat blanc. Merci d'indiquer cette lettre lors de votre commande. Cette tablette est également disponible au chocolat au lait.",
         price: 3.80,
         image: "produit-5-tablette-decoree.jpg"
     },
     {
         id: 6,
-        name: "Tablette Classique au Chocolat Noir",
-        description: "Découvrez notre Tablette Classique au Chocolat Noir.",
+        name: "Tablette Classique au Chocolat Noir ou Lait",
+        description: "Découvrez notre Tablette Classique au Chocolat Noir ou Lait.",
         price: 2.10,
         image: "produit-6-tablette-classique.jpg"
     }
@@ -463,3 +463,20 @@ Total: ${formData.total.toFixed(2)} €`;
         });
 }
 
+document.getElementById("orderForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const order = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        email: document.getElementById("email").value,
+        address: document.getElementById("address").value,
+        cart: JSON.stringify(cart)
+    };
+
+    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    alert("Commande envoyée !");
+});

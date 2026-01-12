@@ -5,70 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrôle - Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #d4c4b0;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #e8ddd4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f5f1eb;
+        }
+        .logout-btn {
+            background-color: #8B6F47;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: auto;
+        }
+        .logout-btn:hover {
+            background-color: #6B5435;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <span class="brand-name">Jean Chocolatier - Contrôle</span>
-            </a>
-        </div>
-    </header>
 
-    <main class="contact-main">
-        <section class="contact-section">
-            <h1>Données de contrôle</h1>
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-container">
+            <span class="brand-name">Panneau de Contrôle</span>
+        </a>
+        <button id="logoutBtn" class="logout-btn">Déconnexion</button>
+    </div>
+</header>
 
-            <h2>📦 Commandes</h2>
-            <div id="ordersList"></div>
+<main class="contact-main">
+    <section class="contact-section">
+        <h1>Données de Contrôle</h1>
 
-            <h2>📨 Messages Contact</h2>
-            <div id="contactList"></div>
-        </section>
-    </main>
+        <h2>📦 Commandes</h2>
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Adresse</th>
+                    <th>Contenu du Panier</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h2>📨 Messages Contact</h2>
+        <table id="messagesTable">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Sujet</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </section>
+</main>
 
 <script>
+// 🔒 Vérification d'accès
+if (localStorage.getItem("adminLogged") !== "true") {
+    alert("Accès refusé.");
+    window.location.href = "login.html";
+}
+
+// 📋 Chargement des données
 function loadData() {
     const orders = JSON.parse(localStorage.getItem("orders") || "[]");
     const messages = JSON.parse(localStorage.getItem("contactMessages") || "[]");
 
-    // commandes
-    const ordersList = document.getElementById("ordersList");
-    if (orders.length === 0) ordersList.innerHTML = "<p>Aucune commande enregistrée.</p>";
-    else ordersList.innerHTML = orders.map(o => `
-        <div class="control-item">
-            <strong>${o.firstName} ${o.lastName}</strong><br>
-            Email : ${o.email}<br>
-            Adresse : ${o.address}<br>
-            Panier : ${o.cart}<br>
-            <hr>
-        </div>
-    `).join("");
+    const ordersBody = document.querySelector("#ordersTable tbody");
+    const messagesBody = document.querySelector("#messagesTable tbody");
 
-    // messages contact
-    const contactList = document.getElementById("contactList");
-    if (messages.length === 0) contactList.innerHTML = "<p>Aucun message.</p>";
-    else contactList.innerHTML = messages.map(m => `
-        <div class="control-item">
-            <strong>${m.name}</strong><br>
-            Email : ${m.email}<br>
-            Sujet : ${m.subject}<br>
-            Message : ${m.message}<br>
-            <hr>
-        </div>
-    `).join("");
+    // Commandes
+    if (orders.length === 0) {
+        ordersBody.innerHTML = "<tr><td colspan='5'>Aucune commande</td></tr>";
+    } else {
+        ordersBody.innerHTML = orders.map(o => `
+            <tr>
+                <td>${o.firstName}</td>
+                <td>${o.lastName}</td>
+                <td>${o.email}</td>
+                <td>${o.address}</td>
+                <td>${o.cart}</td>
+            </tr>
+        `).join("");
+    }
+
+    // Messages
+    if (messages.length === 0) {
+        messagesBody.innerHTML = "<tr><td colspan='4'>Aucun message</td></tr>";
+    } else {
+        messagesBody.innerHTML = messages.map(m => `
+            <tr>
+                <td>${m.name}</td>
+                <td>${m.email}</td>
+                <td>${m.subject}</td>
+                <td>${m.message}</td>
+            </tr>
+        `).join("");
+    }
 }
 
 loadData();
+
+// 🔓 Déconnexion
+document.getElementById("logoutBtn").addEventListener("click", function() {
+    localStorage.removeItem("adminLogged");
+    alert("Vous êtes déconnecté.");
+    window.location.href = "index.html";
+});
 </script>
 
 </body>
 </html>
-<script>
-    // Vérification
-    if (localStorage.getItem("adminLogged") !== "true") {
-        alert("Accès refusé");
-        window.location.href = "login.html";
-    }
-    </script>
-    

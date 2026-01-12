@@ -11,9 +11,9 @@ const products = [
         id: 2,
         name: "Truffes au Chocolat Noir",
         description: "Découvrez nos Truffes au Chocolat Noir, à la texture fondante en bouche.",
-        price: 7.50, // Prix par défaut (sera remplacé par les options)
+        price: 7.50,
         image: "produit-2-truffes.jpg",
-        isTruffes: true, // Indicateur spécial pour les truffes
+        isTruffes: true,
         truffesOptions: [
             { quantity: 5, price: 4.00 },
             { quantity: 10, price: 7.50 },
@@ -51,418 +51,181 @@ const products = [
     }
 ];
 
-// Gestion du panier
+// ---------- PANIER ----------
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
     renderProducts();
     updateCartCount();
     setupCartEvents();
-    loadCartCount();
 });
 
-// Afficher les produits
+// ---------- AFFICHAGE DES PRODUITS ----------
 function renderProducts() {
     const productsGrid = document.getElementById('productsGrid');
     if (!productsGrid) return;
 
     productsGrid.innerHTML = products.map(product => {
-        // Gestion spéciale pour les truffes
+
         if (product.isTruffes) {
             return `
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="product-image-placeholder" style="display: none;">🍬</div>
+                        <img src="${product.image}" alt="${product.name}">
                     </div>
-                    <h3 class="product-name">${product.name}</h3>
-                    <p class="product-description">${product.description}</p>
-                    <div class="product-price" id="price-${product.id}">${product.truffesOptions[0].price.toFixed(2)} €</div>
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+
+                    <div class="product-price" id="price-${product.id}">
+                        ${product.truffesOptions[0].price.toFixed(2)} €
+                    </div>
+
                     <div class="product-controls">
-                        <select class="quantity-select" id="truffes-option-${product.id}" onchange="updateTruffesPrice(${product.id})">
-                            ${product.truffesOptions.map(option => 
-                                `<option value="${option.quantity}" data-price="${option.price}">${option.quantity} Truffes</option>`
-                            ).join('')}
+                        <select id="truffes-option-${product.id}" onchange="updateTruffesPrice(${product.id})">
+                            ${product.truffesOptions.map(o => 
+                                `<option value="${o.quantity}" data-price="${o.price}">${o.quantity} truffes</option>`
+                            )}
                         </select>
-                        <button class="btn-add-cart" onclick="addToCart(${product.id}, true)">
-                            Ajouter au panier
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else {
-            // Produits normaux
-            return `
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="product-image-placeholder" style="display: none;">🍫</div>
-                    </div>
-                    <h3 class="product-name">${product.name}</h3>
-                    <p class="product-description">${product.description}</p>
-                    <div class="product-price">${product.price.toFixed(2)} €</div>
-                    <div class="product-controls">
-                        <select class="quantity-select" id="qty-${product.id}">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                        <button class="btn-add-cart" onclick="addToCart(${product.id})">
-                            Ajouter au panier
-                        </button>
+
+                        <button onclick="addToCart(${product.id}, true)">Ajouter</button>
                     </div>
                 </div>
             `;
         }
+
+        return `
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </div>
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <div class="product-price">${product.price.toFixed(2)} €</div>
+
+                <div class="product-controls">
+                    <select id="qty-${product.id}">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+
+                    <button onclick="addToCart(${product.id})">Ajouter</button>
+                </div>
+            </div>
+        `;
+
     }).join('');
 }
 
-// Mettre à jour le prix des truffes selon l'option choisie
 function updateTruffesPrice(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product || !product.isTruffes) return;
-
     const select = document.getElementById(`truffes-option-${productId}`);
-    const priceElement = document.getElementById(`price-${productId}`);
-    const selectedOption = select.options[select.selectedIndex];
-    const price = parseFloat(selectedOption.getAttribute('data-price'));
-    
-    if (priceElement) {
-        priceElement.textContent = price.toFixed(2) + ' €';
-    }
+    const price = select.options[select.selectedIndex].dataset.price;
+    document.getElementById(`price-${productId}`).textContent = parseFloat(price).toFixed(2) + " €";
 }
 
-// Ajouter au panier
+// ---------- AJOUT AU PANIER ----------
 function addToCart(productId, isTruffes = false) {
     const product = products.find(p => p.id === productId);
-    if (!product) return;
 
-    let quantity, price, displayName;
+    let itemName, quantity, price, key;
 
-    if (isTruffes && product.isTruffes) {
-        // Pour les truffes, utiliser l'option sélectionnée
+    if (isTruffes) {
         const select = document.getElementById(`truffes-option-${productId}`);
-        const selectedOption = select.options[select.selectedIndex];
-        quantity = parseInt(selectedOption.value);
-        price = parseFloat(selectedOption.getAttribute('data-price'));
-        displayName = `${product.name} (${quantity} truffes)`;
+        quantity = parseInt(select.value);
+        price = parseFloat(select.options[select.selectedIndex].dataset.price);
+        itemName = `${product.name} (${quantity} truffes)`;
+        key = `${productId}-${quantity}`;
     } else {
-        // Pour les produits normaux
-        const quantitySelect = document.getElementById(`qty-${productId}`);
-        quantity = parseInt(quantitySelect.value);
+        quantity = parseInt(document.getElementById(`qty-${productId}`).value);
         price = product.price;
-        displayName = product.name;
+        itemName = product.name;
+        key = productId;
     }
 
-    // Créer un identifiant unique pour les truffes avec quantité différente
-    const cartItemId = isTruffes ? `truffes-${productId}-${quantity}` : productId;
-    
-    const existingItem = cart.find(item => {
-        if (isTruffes) {
-            return item.cartItemId === cartItemId;
-        } else {
-            return item.id === productId;
-        }
-    });
-    
-    if (existingItem) {
-        existingItem.quantity += 1; // Ajouter une unité de plus
+    const existing = cart.find(item => item.key === key);
+
+    if (existing) {
+        existing.quantity++;
     } else {
         cart.push({
-            id: productId,
-            cartItemId: cartItemId,
-            name: displayName,
+            key: key,
+            name: itemName,
             price: price,
-            quantity: 1,
-            image: product.image,
-            isTruffes: isTruffes,
-            truffesQuantity: isTruffes ? quantity : null
+            quantity: 1
         });
     }
 
     saveCart();
     updateCartCount();
-    showCartNotification();
 }
 
-// Sauvegarder le panier
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-// Mettre à jour le compteur du panier
 function updateCartCount() {
-    const cartCount = document.getElementById('cartCount');
-    if (cartCount) {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = totalItems;
-    }
+    document.getElementById('cartCount').textContent =
+        cart.reduce((sum, item) => sum + item.quantity, 0);
 }
 
-// Charger le compteur du panier (pour la page contact)
-function loadCartCount() {
-    const cartCount = document.getElementById('cartCount');
-    if (cartCount) {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = totalItems;
-    }
-}
-
-// Notification d'ajout au panier
-function showCartNotification() {
-    // Animation simple - vous pouvez améliorer cela
-    const cartIcon = document.getElementById('cartIcon');
-    if (cartIcon) {
-        cartIcon.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-            cartIcon.style.transform = 'scale(1)';
-        }, 200);
-    }
-}
-
-// Événements du panier
+// ---------- PANIER SIDEBAR ----------
 function setupCartEvents() {
     const cartIcon = document.getElementById('cartIcon');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const closeCart = document.getElementById('closeCart');
+    const sidebar = document.getElementById('cartSidebar');
     const overlay = document.getElementById('overlay');
-    const btnOrder = document.getElementById('btnOrder');
-    const orderModal = document.getElementById('orderModal');
-    const closeModal = document.getElementById('closeModal');
-    const orderForm = document.getElementById('orderForm');
 
-    if (cartIcon) {
-        cartIcon.addEventListener('click', (e) => {
-            e.preventDefault();
-            openCart();
-        });
-    }
+    cartIcon.addEventListener('click', () => {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        renderCartItems();
+    });
 
-    if (closeCart) {
-        closeCart.addEventListener('click', closeCartSidebar);
-    }
+    document.getElementById('closeCart').addEventListener('click', closeCart);
+    overlay.addEventListener('click', closeCart);
 
-    if (overlay) {
-        overlay.addEventListener('click', closeCartSidebar);
-    }
-
-    if (btnOrder) {
-        btnOrder.addEventListener('click', () => {
-            if (cart.length === 0) {
-                alert('Votre panier est vide');
-                return;
-            }
-            closeCartSidebar();
-            openOrderModal();
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', closeOrderModal);
-    }
-
-    if (orderForm) {
-        orderForm.addEventListener('submit', handleOrderSubmit);
-    }
-
-    renderCartItems();
+    document.getElementById('btnOrder').addEventListener('click', () => {
+        if (cart.length === 0) return alert("Votre panier est vide");
+        openOrderModal();
+    });
 }
 
-// Ouvrir le panier
-function openCart() {
-    const cartSidebar = document.getElementById('cartSidebar');
-    const overlay = document.getElementById('overlay');
-    if (cartSidebar) cartSidebar.classList.add('active');
-    if (overlay) overlay.classList.add('active');
-    renderCartItems();
+function closeCart() {
+    document.getElementById('cartSidebar').classList.remove('active');
+    document.getElementById('overlay').classList.remove('active');
 }
 
-// Fermer le panier
-function closeCartSidebar() {
-    const cartSidebar = document.getElementById('cartSidebar');
-    const overlay = document.getElementById('overlay');
-    if (cartSidebar) cartSidebar.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-}
-
-// Afficher les articles du panier
 function renderCartItems() {
     const cartItems = document.getElementById('cartItems');
-    if (!cartItems) return;
-
     if (cart.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart">Votre panier est vide</p>';
-        const cartTotal = document.getElementById('cartTotal');
-        if (cartTotal) cartTotal.textContent = '0,00 €';
+        cartItems.innerHTML = "<p class='empty-cart'>Votre panier est vide</p>";
+        document.getElementById('cartTotal').textContent = "0,00 €";
         return;
     }
 
-    cartItems.innerHTML = cart.map((item, index) => {
-        const total = item.price * item.quantity;
-        return `
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-details">Quantité: ${item.quantity} × ${item.price.toFixed(2)} €</div>
-                </div>
-                <div class="cart-item-price">${total.toFixed(2)} €</div>
-                <button class="remove-item" onclick="removeFromCart(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
+    cartItems.innerHTML = cart.map((item, index) => `
+        <div class="cart-item">
+            <div>
+                <strong>${item.name}</strong><br>
+                ${item.quantity} × ${item.price.toFixed(2)} €
             </div>
-        `;
-    }).join('');
+            <button onclick="removeFromCart(${index})">❌</button>
+        </div>
+    `).join('');
 
-    // Calculer le total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const cartTotal = document.getElementById('cartTotal');
-    if (cartTotal) cartTotal.textContent = total.toFixed(2) + ' €';
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    document.getElementById('cartTotal').textContent = total.toFixed(2) + " €";
 }
 
-// Retirer du panier
-function removeFromCart(index) {
-    cart.splice(index, 1);
+function removeFromCart(i) {
+    cart.splice(i, 1);
     saveCart();
-    updateCartCount();
     renderCartItems();
+    updateCartCount();
 }
 
-// Ouvrir le modal de commande
-function openOrderModal() {
-    const orderModal = document.getElementById('orderModal');
-    if (orderModal) orderModal.classList.add('active');
-}
-
-// Fermer le modal de commande
-function closeOrderModal() {
-    const orderModal = document.getElementById('orderModal');
-    if (orderModal) orderModal.classList.remove('active');
-}
-
-// Gérer la soumission de la commande
-function handleOrderSubmit(e) {
-    e.preventDefault();
-    
-    const formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        address: document.getElementById('address').value,
-        cart: cart,
-        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    };
-
-    // Désactiver le bouton pendant l'envoi
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    const originalButtonText = submitButton ? submitButton.textContent : 'Valider la commande';
-    if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Traitement en cours...';
-    }
-
-    // Créer le contenu détaillé de l'email avec prix de chaque article
-    const cartItemsDetails = cart.map(item => {
-        const itemTotal = (item.price * item.quantity).toFixed(2);
-        return `${item.name}\n  Quantité: ${item.quantity}\n  Prix unitaire: ${item.price.toFixed(2)} €\n  Prix total: ${itemTotal} €`;
-    }).join('\n\n');
-
-    const cartItemsSummary = cart.map(item => 
-        `${item.name} (x${item.quantity}) : ${(item.price * item.quantity).toFixed(2)} €`
-    ).join('\n');
-
-    // Préparer les paramètres pour EmailJS
-    const emailParams = {
-        customer_name: `${formData.firstName} ${formData.lastName}`,
-        customer_email: formData.email,
-        customer_address: formData.address,
-        order_items: cartItemsDetails,
-        order_summary: cartItemsSummary,
-        order_total: formData.total.toFixed(2) + ' €',
-        to_email: 'chezcapucineetjean.2022@gmail.com'
-    };
-
-    // Envoyer via EmailJS
-    emailjs.send('service_order', 'template_order', emailParams)
-        .then(function(response) {
-            console.log('EmailJS SUCCESS!', response.status, response.text);
-            alert('Commande validée avec succès ! Merci pour votre achat.');
-            cart = [];
-            saveCart();
-            updateCartCount();
-            closeOrderModal();
-            renderCartItems();
-            e.target.reset();
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent = originalButtonText;
-            }
-        }, function(error) {
-            console.error('EmailJS FAILED...', error);
-            // Essayer d'envoyer au serveur en secours
-            const emailBody = `Nouvelle commande de ${formData.firstName} ${formData.lastName}
-
-Client:
-- Nom: ${formData.firstName} ${formData.lastName}
-- Email: ${formData.email}
-- Adresse: ${formData.address}
-
-Commande:
-${cartItemsSummary}
-
-Total: ${formData.total.toFixed(2)} €`;
-
-            fetch('/api/order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Serveur non disponible');
-            })
-            .then(data => {
-                if (data.success) {
-                    alert('Commande validée avec succès ! Merci pour votre achat.');
-                    cart = [];
-                    saveCart();
-                    updateCartCount();
-                    closeOrderModal();
-                    renderCartItems();
-                    e.target.reset();
-                } else {
-                    throw new Error('Erreur serveur');
-                }
-            })
-            .catch(error => {
-                // Solution de secours finale : utiliser mailto
-                const subject = encodeURIComponent(`Nouvelle commande de ${formData.firstName} ${formData.lastName}`);
-                const body = encodeURIComponent(emailBody);
-                window.location.href = `mailto:chezcapucineetjean.2022@gmail.com?subject=${subject}&body=${body}`;
-                
-                alert('Commande validée ! Votre client de messagerie va s\'ouvrir pour confirmer l\'envoi.');
-                cart = [];
-                saveCart();
-                updateCartCount();
-                closeOrderModal();
-                renderCartItems();
-                e.target.reset();
-            })
-            .finally(() => {
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                }
-            });
-        });
-}
-
+// ---------- COMMANDE ----------
 document.getElementById("orderForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -479,4 +242,9 @@ document.getElementById("orderForm").addEventListener("submit", function(e) {
     localStorage.setItem("orders", JSON.stringify(orders));
 
     alert("Commande envoyée !");
+    cart = [];
+    saveCart();
+    updateCartCount();
+    renderCartItems();
+    closeOrderModal();
 });

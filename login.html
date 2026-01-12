@@ -3,60 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - Jean Chocolatier</title>
+    <title>Connexion</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo" onerror="this.onerror=null; this.src='logo.jpg'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='block';};">
-                <div class="logo-placeholder" style="display: none;">🍫</div>
-                <span class="brand-name">Jean Chocolatier</span>
-            </a>
-            <nav>
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-                <a href="controle.html" class="nav-link" id="controleLink" style="display: none;">
-                    <i class="fas fa-cog"></i> Contrôle
-                </a>
-                <a href="#" class="nav-link active" id="loginLink">
-                    <i class="fas fa-user"></i> Connexion
-                </a>
-                <div class="cart-icon-container">
-                    <a href="index.html" class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <main class="contact-main">
-        <section class="contact-section">
-            <h1>Connexion</h1>
-            <p class="contact-intro">
-                Connectez-vous pour accéder à la page de contrôle.
-            </p>
-            <form id="loginForm" class="contact-form">
-                <div class="form-group">
-                    <label for="loginEmail">Email *</label>
-                    <input type="email" id="loginEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Mot de passe *</label>
-                    <input type="password" id="loginPassword" name="password" required>
-                </div>
-                <button type="submit" class="btn-submit">Se connecter</button>
-                <div id="loginMessageStatus" class="message-status"></div>
-            </form>
-        </section>
-    </main>
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-container">
+            <span class="brand-name">Jean Chocolatier</span>
+        </a>
+    </div>
+</header>
 
-    <script src="script.js"></script>
-    <script src="login.js"></script>
+<main class="contact-main">
+    <section class="contact-section">
+        <h1>Connexion</h1>
+        <form id="loginForm" class="contact-form">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Mot de passe</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Se connecter</button>
+
+            <div id="loginStatus" class="message-status"></div>
+        </form>
+    </section>
+</main>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    if (email === "jean.chocolatier.site@gmail.com" && password === "Je=13716") {
+        localStorage.setItem("adminLogged", "true");
+        window.location.href = "controle.html";
+    } else {
+        const status = document.getElementById("loginStatus");
+        status.textContent = "Email ou mot de passe incorrect";
+        status.className = "message-status error";
+    }
+});
+</script>
+
 </body>
 </html>
-

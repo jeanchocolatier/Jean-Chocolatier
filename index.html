@@ -6,12 +6,6 @@
     <title>Jean Chocolatier - Chocolats Artisanaux</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("hNFvt7uNKVH4Rx9mi");
-        })();
-    </script>
 </head>
 <body>
     <header>
@@ -24,6 +18,7 @@
             <nav>
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="contact.html" class="nav-link">Contact</a>
+                <a href="login.html" class="nav-link">Connexion</a>
                 <div class="cart-icon-container">
                     <a href="#" class="cart-icon" id="cartIcon">
                         <i class="fas fa-shopping-cart"></i>
@@ -39,21 +34,20 @@
             <div class="hero-content">
                 <h1>Chocolats Artisanaux</h1>
                 <p class="hero-description">
-                    Découvrez l'art du chocolat fait maison. Chaque création est préparée avec passion par Jean, à l'aide des meilleurs ingrédients, pour vous offrir une expérience gustative unique. 
-                    Plongez dans l'univers gourmand de Jean Chocolatier. 
+                    Découvrez l'art du chocolat fait maison. Chaque création est préparée avec passion par Jean à l'aide des meilleurs ingrédients pour vous offrir une expérience gustative unique. 
+                    Plongez dans l'univers gourmand de Jean Chocolatier.
                 </p>
             </div>
         </section>
 
         <section class="products-section">
-            <h2>Nos Créations</h2>
+            <h2>Nos Produits</h2>
             <div class="products-grid" id="productsGrid">
                 <!-- Les produits seront générés par JavaScript -->
             </div>
         </section>
     </main>
 
-    <!-- Panier latéral -->
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h2>Mon Panier</h2>
@@ -72,10 +66,8 @@
         </div>
     </div>
 
-    <!-- Overlay pour le panier -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- Formulaire de commande -->
     <div class="order-modal" id="orderModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -99,14 +91,4 @@
                 </div>
                 <div class="form-group">
                     <label for="address">Adresse *</label>
-                    <textarea id="address" name="address" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn-submit">Valider la commande</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
+                    <textarea id="address" name="address" rows="3" required></t

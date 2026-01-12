@@ -64,3 +64,11 @@ loadData();
 
 </body>
 </html>
+<script>
+    // Vérification
+    if (localStorage.getItem("adminLogged") !== "true") {
+        alert("Accès refusé");
+        window.location.href = "login.html";
+    }
+    </script>
+    

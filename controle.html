@@ -27,7 +27,7 @@
         tr:nth-child(even) {
             background-color: #f5f1eb;
         }
-        .logout-btn {
+        .logout-btn, .clear-btn {
             background-color: #8B6F47;
             color: white;
             border: none;
@@ -35,10 +35,15 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
-            margin-left: auto;
+            margin-left: 1rem;
         }
-        .logout-btn:hover {
+        .logout-btn:hover, .clear-btn:hover {
             background-color: #6B5435;
+        }
+        .btn-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -55,9 +60,16 @@
 
 <main class="contact-main">
     <section class="contact-section">
+
         <h1>Données de Contrôle</h1>
 
+        <!-- COMMANDES -->
         <h2>📦 Commandes</h2>
+
+        <div class="btn-row">
+            <button id="clearOrders" class="clear-btn">Effacer l’historique des commandes</button>
+        </div>
+
         <table id="ordersTable">
             <thead>
                 <tr>
@@ -71,7 +83,13 @@
             <tbody></tbody>
         </table>
 
+        <!-- MESSAGES -->
         <h2>📨 Messages Contact</h2>
+
+        <div class="btn-row">
+            <button id="clearMessages" class="clear-btn">Effacer l’historique des messages</button>
+        </div>
+
         <table id="messagesTable">
             <thead>
                 <tr>
@@ -88,13 +106,13 @@
 </main>
 
 <script>
-// 🔒 Vérification d'accès
+// 🔒 Protection d'accès
 if (localStorage.getItem("adminLogged") !== "true") {
     alert("Accès refusé.");
     window.location.href = "login.html";
 }
 
-// 📋 Chargement des données
+// 📦 Charger les commandes et messages
 function loadData() {
     const orders = JSON.parse(localStorage.getItem("orders") || "[]");
     const messages = JSON.parse(localStorage.getItem("contactMessages") || "[]");
@@ -102,7 +120,7 @@ function loadData() {
     const ordersBody = document.querySelector("#ordersTable tbody");
     const messagesBody = document.querySelector("#messagesTable tbody");
 
-    // Commandes
+    // COMMANDES
     if (orders.length === 0) {
         ordersBody.innerHTML = "<tr><td colspan='5'>Aucune commande</td></tr>";
     } else {
@@ -117,7 +135,7 @@ function loadData() {
         `).join("");
     }
 
-    // Messages
+    // MESSAGES
     if (messages.length === 0) {
         messagesBody.innerHTML = "<tr><td colspan='4'>Aucun message</td></tr>";
     } else {
@@ -133,6 +151,22 @@ function loadData() {
 }
 
 loadData();
+
+// ❌ Effacer les commandes
+document.getElementById("clearOrders").addEventListener("click", function() {
+    if (confirm("Voulez-vous vraiment effacer toutes les commandes ?")) {
+        localStorage.removeItem("orders");
+        loadData();
+    }
+});
+
+// ❌ Effacer les messages
+document.getElementById("clearMessages").addEventListener("click", function() {
+    if (confirm("Voulez-vous vraiment effacer tous les messages ?")) {
+        localStorage.removeItem("contactMessages");
+        loadData();
+    }
+});
 
 // 🔓 Déconnexion
 document.getElementById("logoutBtn").addEventListener("click", function() {

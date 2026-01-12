@@ -5,175 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrôle - Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
-
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #d4c4b0;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th {
-            background-color: #e8ddd4;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f5f1eb;
-        }
-        .logout-btn, .clear-btn {
-            background-color: #8B6F47;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-left: 1rem;
-        }
-        .logout-btn:hover, .clear-btn:hover {
-            background-color: #6B5435;
-        }
-        .btn-row {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 1rem;
-        }
-    </style>
 </head>
 <body>
 
 <header>
     <div class="header-content">
-        <a href="index.html" class="logo-container">
-            <span class="brand-name">Panneau de Contrôle</span>
-        </a>
-        <button id="logoutBtn" class="logout-btn">Déconnexion</button>
+        <span class="brand-name">Panneau de Contrôle</span>
+        <button onclick="logout()" class="logout-btn">Déconnexion</button>
     </div>
 </header>
 
-<main class="contact-main">
-    <section class="contact-section">
+<main class="control-main">
+    <h1>Données enregistrées</h1>
 
-        <h1>Données de Contrôle</h1>
+    <h2>Commandes</h2>
+    <button onclick="clearOrders()" class="clear-btn">Effacer historique commandes</button>
+    <table id="ordersTable">
+        <thead>
+            <tr>
+                <th>Nom</th><th>Email</th><th>Adresse</th><th>Panier</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <!-- COMMANDES -->
-        <h2>📦 Commandes</h2>
+    <h2>Messages Contact</h2>
+    <button onclick="clearMessages()" class="clear-btn">Effacer historique messages</button>
+    <table id="messagesTable">
+        <thead>
+            <tr>
+                <th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <div class="btn-row">
-            <button id="clearOrders" class="clear-btn">Effacer l’historique des commandes</button>
-        </div>
-
-        <table id="ordersTable">
-            <thead>
-                <tr>
-                    <th>Prénom</th>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Adresse</th>
-                    <th>Contenu du Panier</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <!-- MESSAGES -->
-        <h2>📨 Messages Contact</h2>
-
-        <div class="btn-row">
-            <button id="clearMessages" class="clear-btn">Effacer l’historique des messages</button>
-        </div>
-
-        <table id="messagesTable">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Sujet</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-    </section>
 </main>
 
 <script>
-// 🔒 Protection d'accès
 if (localStorage.getItem("adminLogged") !== "true") {
-    alert("Accès refusé.");
     window.location.href = "login.html";
 }
 
-// 📦 Charger les commandes et messages
-function loadData() {
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    const messages = JSON.parse(localStorage.getItem("contactMessages") || "[]");
+// Charger les commandes
+const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+const tbodyOrders = document.querySelector("#ordersTable tbody");
 
-    const ordersBody = document.querySelector("#ordersTable tbody");
-    const messagesBody = document.querySelector("#messagesTable tbody");
+orders.forEach(o => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>${o.firstName} ${o.lastName}</td>
+        <td>${o.email}</td>
+        <td>${o.address}</td>
+        <td>${o.cart}</td>
+    `;
+    tbodyOrders.appendChild(tr);
+});
 
-    // COMMANDES
-    if (orders.length === 0) {
-        ordersBody.innerHTML = "<tr><td colspan='5'>Aucune commande</td></tr>";
-    } else {
-        ordersBody.innerHTML = orders.map(o => `
-            <tr>
-                <td>${o.firstName}</td>
-                <td>${o.lastName}</td>
-                <td>${o.email}</td>
-                <td>${o.address}</td>
-                <td>${o.cart}</td>
-            </tr>
-        `).join("");
-    }
+// Charger les messages
+const msgs = JSON.parse(localStorage.getItem("contactMessages") || "[]");
+const tbodyMsg = document.querySelector("#messagesTable tbody");
 
-    // MESSAGES
-    if (messages.length === 0) {
-        messagesBody.innerHTML = "<tr><td colspan='4'>Aucun message</td></tr>";
-    } else {
-        messagesBody.innerHTML = messages.map(m => `
-            <tr>
-                <td>${m.name}</td>
-                <td>${m.email}</td>
-                <td>${m.subject}</td>
-                <td>${m.message}</td>
-            </tr>
-        `).join("");
+msgs.forEach(m => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>${m.name}</td>
+        <td>${m.email}</td>
+        <td>${m.subject}</td>
+        <td>${m.message}</td>
+    `;
+    tbodyMsg.appendChild(tr);
+});
+
+function clearOrders() {
+    if (confirm("Supprimer toutes les commandes ?")) {
+        localStorage.removeItem("orders");
+        location.reload();
     }
 }
 
-loadData();
-
-// ❌ Effacer les commandes
-document.getElementById("clearOrders").addEventListener("click", function() {
-    if (confirm("Voulez-vous vraiment effacer toutes les commandes ?")) {
-        localStorage.removeItem("orders");
-        loadData();
-    }
-});
-
-// ❌ Effacer les messages
-document.getElementById("clearMessages").addEventListener("click", function() {
-    if (confirm("Voulez-vous vraiment effacer tous les messages ?")) {
+function clearMessages() {
+    if (confirm("Supprimer tous les messages ?")) {
         localStorage.removeItem("contactMessages");
-        loadData();
+        location.reload();
     }
-});
+}
 
-// 🔓 Déconnexion
-document.getElementById("logoutBtn").addEventListener("click", function() {
+function logout() {
     localStorage.removeItem("adminLogged");
-    alert("Vous êtes déconnecté.");
     window.location.href = "index.html";
-});
+}
 </script>
 
 </body>

@@ -8,87 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo" onerror="this.onerror=null; this.src='logo.jpg'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='block';};">
-                <div class="logo-placeholder" style="display: none;">🍫</div>
-                <span class="brand-name">Jean Chocolatier</span>
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+            <span class="brand-name">Jean Chocolatier</span>
+        </a>
+        <nav>
+            <a href="index.html" class="nav-link">Accueil</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+            <a href="login.html" class="nav-link">Connexion</a>
+            <a href="#" class="cart-icon" id="cartIcon">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCount">0</span>
             </a>
-            <nav>
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-                <a href="login.html" class="nav-link">Connexion</a>
-                <div class="cart-icon-container">
-                    <a href="#" class="cart-icon" id="cartIcon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Chocolats Artisanaux</h1>
-                <p class="hero-description">
-                    Découvrez l'art du chocolat fait maison. Chaque création est préparée avec passion par Jean à l'aide des meilleurs ingrédients pour vous offrir une expérience gustative unique. 
-                    Plongez dans l'univers gourmand de Jean Chocolatier.
-                </p>
-            </div>
-        </section>
-
-        <section class="products-section">
-            <h2>Nos Produits</h2>
-            <div class="products-grid" id="productsGrid">
-                <!-- Les produits seront générés par JavaScript -->
-            </div>
-        </section>
-    </main>
-
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h2>Mon Panier</h2>
-            <button class="close-cart" id="closeCart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <p class="empty-cart">Votre panier est vide</p>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <strong>Total: <span id="cartTotal">0,00 €</span></strong>
-            </div>
-            <button class="btn-order" id="btnOrder">Commander</button>
-        </div>
+        </nav>
     </div>
+</header>
 
-    <div class="overlay" id="overlay"></div>
+<main>
+    <section class="hero">
+        <h1>Chocolats Artisanaux</h1>
+        <p>Découvrez nos créations faites maison.</p>
+    </section>
 
-    <div class="order-modal" id="orderModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Finaliser votre commande</h2>
-                <button class="close-modal" id="closeModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="orderForm" class="order-form">
-                <div class="form-group">
-                    <label for="firstName">Prénom *</label>
-                    <input type="text" id="firstName" name="firstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="lastName">Nom *</label>
-                    <input type="text" id="lastName" name="lastName" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="address">Adresse *</label>
-                    <textarea id="address" name="address" rows="3" required></t
+    <section class="products-section">
+        <h2>Nos Produits</h2>
+        <div id="productsGrid" class="products-grid"></div>
+    </section>
+</main>
+
+<!-- PANIER -->
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h2>Panier</h2>
+        <button id="closeCart"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="cart-footer">
+        <div>Total : <span id="cartTotal">0,00 €</span></div>
+        <button id="btnOrder" class="btn-order">Commander</button>
+    </div>
+</div>
+<div id="overlay" class="overlay"></div>
+
+<!-- MODAL DE COMMANDE -->
+<div id="orderModal" class="order-modal">
+    <div class="modal-content">
+        <button id="closeModal" class="close-modal">✖</button>
+        <h2>Finaliser votre commande</h2>
+
+        <form id="orderForm">
+            <label>Prénom</label>
+            <input type="text" id="firstName" required>
+
+            <label>Nom</label>
+            <input type="text" id="lastName" required>
+
+            <label>Email</label>
+            <input type="email" id="email" required>
+
+            <label>Adresse</label>
+            <textarea id="address" required></textarea>
+
+            <button type="submit">Envoyer la commande</button>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

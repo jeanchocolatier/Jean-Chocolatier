@@ -5,67 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("hNFvt7uNKVH4Rx9mi");
-        })();
-    </script>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo" onerror="this.onerror=null; this.src='logo.jpg'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='block';};">
-                <div class="logo-placeholder" style="display: none;">🍫</div>
-                <span class="brand-name">Jean Chocolatier</span>
-            </a>
-            <nav>
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="contact.html" class="nav-link active">Contact</a>
-                <div class="cart-icon-container">
-                    <a href="index.html" class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <main class="contact-main">
-        <section class="contact-section">
-            <h1>Contactez-nous</h1>
-            <p class="contact-intro">
-                Une question ? Une demande spéciale ? N'hésitez pas à nous contacter. 
-                Nous serons ravis de vous répondre.
-            </p>
-            <form id="contactForm" class="contact-form">
-                <div class="form-group">
-                    <label for="contactName">Nom *</label>
-                    <input type="text" id="contactName" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="contactEmail">Email *</label>
-                    <input type="email" id="contactEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="contactSubject">Sujet *</label>
-                    <input type="text" id="contactSubject" name="subject" required>
-                </div>
-                <div class="form-group">
-                    <label for="contactMessage">Message *</label>
-                    <textarea id="contactMessage" name="message" rows="6" required></textarea>
-                </div>
-                <button type="submit" class="btn-submit">Envoyer le message</button>
-                <div id="contactMessageStatus" class="message-status"></div>
-            </form>
-        </section>
-    </main>
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-container">
+            <span class="brand-name">Jean Chocolatier</span>
+        </a>
+        <nav>
+            <a href="index.html">Accueil</a>
+            <a href="contact.html">Contact</a>
+            <a href="login.html">Connexion</a>
+            <a href="#" id="cartIcon"><i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span></a>
+        </nav>
+    </div>
+</header>
 
-    <script src="script.js"></script>
-    <script src="contact.js"></script>
+<main class="contact-main">
+    <section class="contact-section">
+        <h1>Contactez-nous</h1>
+
+        <form id="contactForm">
+            <label>Nom</label>
+            <input type="text" id="name" required>
+
+            <label>Email</label>
+            <input type="email" id="email" required>
+
+            <label>Sujet</label>
+            <input type="text" id="subject" required>
+
+            <label>Message</label>
+            <textarea id="message" required></textarea>
+
+            <button type="submit">Envoyer</button>
+        </form>
+    </section>
+</main>
+
+<script>
+document.getElementById("contactForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const msg = {
+        name: name.value,
+        email: email.value,
+        subject: subject.value,
+        message: message.value
+    };
+
+    let messages = JSON.parse(localStorage.getItem("contactMessages") || "[]");
+    messages.push(msg);
+    localStorage.setItem("contactMessages", JSON.stringify(messages));
+
+    alert("Message envoyé !");
+    this.reset();
+});
+</script>
+
 </body>
 </html>
-

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrôle - Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -16,30 +17,27 @@
 </header>
 
 <main class="control-main">
-    <h1>Données enregistrées</h1>
+    <h1>Commandes et Messages</h1>
 
     <h2>Commandes</h2>
-    <button onclick="clearOrders()" class="clear-btn">Effacer historique commandes</button>
-    <table id="ordersTable">
+    <table class="control-table">
         <thead>
             <tr>
-                <th>Nom</th><th>Email</th><th>Adresse</th><th>Panier</th>
+                <th>Prénom</th><th>Nom</th><th>Email</th><th>Adresse</th><th>Panier</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="ordersBody"></tbody>
     </table>
 
     <h2>Messages Contact</h2>
-    <button onclick="clearMessages()" class="clear-btn">Effacer historique messages</button>
-    <table id="messagesTable">
+    <table class="control-table">
         <thead>
             <tr>
                 <th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="messagesBody"></tbody>
     </table>
-
 </main>
 
 <script>
@@ -47,51 +45,46 @@ if (localStorage.getItem("adminLogged") !== "true") {
     window.location.href = "login.html";
 }
 
-// Charger les commandes
-const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-const tbodyOrders = document.querySelector("#ordersTable tbody");
+const supabase = window.supabase.createClient(
+    "https://opwjehlwkksuytrmdeii.supabase.co",
+    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
+);
 
-orders.forEach(o => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td>${o.firstName} ${o.lastName}</td>
-        <td>${o.email}</td>
-        <td>${o.address}</td>
-        <td>${o.cart}</td>
-    `;
-    tbodyOrders.appendChild(tr);
-});
+async function loadOrders() {
+    const { data, error } = await supabase.from("orders").select("*");
+    if (error) return console.log(error);
 
-// Charger les messages
-const msgs = JSON.parse(localStorage.getItem("contactMessages") || "[]");
-const tbodyMsg = document.querySelector("#messagesTable tbody");
-
-msgs.forEach(m => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-        <td>${m.name}</td>
-        <td>${m.email}</td>
-        <td>${m.subject}</td>
-        <td>${m.message}</td>
-    `;
-    tbodyMsg.appendChild(tr);
-});
-
-function clearOrders() {
-    if (confirm("Supprimer toutes les commandes ?")) {
-        localStorage.removeItem("orders");
-        location.reload();
-    }
+    const tbody = document.getElementById("ordersBody");
+    tbody.innerHTML = data.map(order => `
+        <tr>
+            <td>${order.firstName}</td>
+            <td>${order.lastName}</td>
+            <td>${order.email}</td>
+            <td>${order.address}</td>
+            <td>${order.cart}</td>
+        </tr>
+    `).join("");
 }
 
-function clearMessages() {
-    if (confirm("Supprimer tous les messages ?")) {
-        localStorage.removeItem("contactMessages");
-        location.reload();
-    }
+async function loadMessages() {
+    const { data, error } = await supabase.from("contact_messages").select("*");
+    if (error) return console.log(error);
+
+    const tbody = document.getElementById("messagesBody");
+    tbody.innerHTML = data.map(msg => `
+        <tr>
+            <td>${msg.name}</td>
+            <td>${msg.email}</td>
+            <td>${msg.subject}</td>
+            <td>${msg.message}</td>
+        </tr>
+    `).join("");
 }
 
-function logout() {
+loadOrders();
+loadMessages();
+
+function logout(){
     localStorage.removeItem("adminLogged");
     window.location.href = "index.html";
 }

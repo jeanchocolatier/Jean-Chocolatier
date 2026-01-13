@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -27,25 +29,31 @@
         <h1>Contactez-nous</h1>
 
         <form id="contactForm">
-            <label>Nom</label>
+
+            <label>Nom :</label>
             <input type="text" id="name" required>
 
-            <label>Email</label>
+            <label>Email :</label>
             <input type="email" id="email" required>
 
-            <label>Sujet</label>
+            <label>Sujet :</label>
             <input type="text" id="subject" required>
 
-            <label>Message</label>
+            <label>Message :</label>
             <textarea id="message" required></textarea>
 
-            <button type="submit">Envoyer</button>
+            <button type="submit" class="btn-submit-contact">Envoyer</button>
         </form>
     </section>
 </main>
 
 <script>
-document.getElementById("contactForm").addEventListener("submit", function(e) {
+const supabase = window.supabase.createClient(
+    "https://opwjehlwkksuytrmdeii.supabase.co",
+    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
+);
+
+document.getElementById("contactForm").addEventListener("submit", async function(e){
     e.preventDefault();
 
     const msg = {
@@ -55,9 +63,13 @@ document.getElementById("contactForm").addEventListener("submit", function(e) {
         message: message.value
     };
 
-    let messages = JSON.parse(localStorage.getItem("contactMessages") || "[]");
-    messages.push(msg);
-    localStorage.setItem("contactMessages", JSON.stringify(messages));
+    const { error } = await supabase.from("contact_messages").insert(msg);
+
+    if (error) {
+        alert("Erreur lors de l'envoi !");
+        console.log(error);
+        return;
+    }
 
     alert("Message envoyé !");
     this.reset();

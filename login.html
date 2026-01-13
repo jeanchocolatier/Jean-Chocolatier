@@ -20,24 +20,23 @@
     <h1>Connexion Admin</h1>
 
     <form id="loginForm" class="login-form">
-        <label>Email</label>
+        <label>Email :</label>
         <input type="email" id="loginEmail" required>
 
-        <label>Mot de passe</label>
+        <label>Mot de passe :</label>
         <input type="password" id="loginPassword" required>
 
-        <button type="submit">Se connecter</button>
+        <button type="submit" class="btn-login">Se connecter</button>
     </form>
 </main>
 
 <script>
-document.getElementById("loginForm").addEventListener("submit", function(e) {
+document.getElementById("loginForm").addEventListener("submit", function(e){
     e.preventDefault();
 
-    const email = loginEmail.value;
-    const pass = loginPassword.value;
+    if (loginEmail.value === "jean.chocolatier.site@gmail.com" &&
+        loginPassword.value === "Je=13716") {
 
-    if (email === "jean.chocolatier.site@gmail.com" && pass === "Je=13716") {
         localStorage.setItem("adminLogged", "true");
         window.location.href = "controle.html";
     } else {

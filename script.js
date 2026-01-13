@@ -1,239 +1,144 @@
 // Produits disponibles
 const products = [
-    {
-        id: 1,
-        name: "Tablette Pralinée au Chocolat Noir",
-        description: "Découvrez notre nouvelle tablette au chocolat praliné Édition Limitée. À l'intérieur de cette tablette, vous trouverez une délicieuse couche de praliné noisette et amande avec ses croquantes crêpes dentelles, qui donnent du croustillant à la tablette. Cette tablette est sans sucres ajoutés ! Elle est également disponible au chocolat au lait.",
-        price: 4.80,
-        image: "produit-1-tablette-praline.jpg"
+    { id: 1, name: "Tablette Pralinée", price: 4.80, image: "produit-1-tablette-praline.jpg", description: "Délicieuse tablette pralinée." },
+    { id: 2, name: "Truffes Chocolat Noir", price: 7.50, image: "produit-2-truffes.jpg", isTruffes: true,
+      truffesOptions: [
+        { quantity: 5, price: 4 },
+        { quantity: 10, price: 7.5 },
+        { quantity: 15, price: 10 },
+        { quantity: 20, price: 12.5 }
+      ]
     },
-    {
-        id: 2,
-        name: "Truffes au Chocolat Noir",
-        description: "Découvrez nos Truffes au Chocolat Noir, à la texture fondante en bouche.",
-        price: 7.50,
-        image: "produit-2-truffes.jpg",
-        isTruffes: true,
-        truffesOptions: [
-            { quantity: 5, price: 4.00 },
-            { quantity: 10, price: 7.50 },
-            { quantity: 15, price: 10.00 },
-            { quantity: 20, price: 12.50 }
-        ]
-    },
-    {
-        id: 3,
-        name: "Pâte à tartiner",
-        description: "Découvrez notre délicieuse pâte à tartiner créée à base de 3 ingrédients seulement : du chocolat, des noisettes, et des amandes. Elle se conserve 2 semaines. Sans sucres ajoutés !",
-        price: 5.00,
-        image: "produit-3-pate-tartiner.jpg"
-    },
-    {
-        id: 4,
-        name: "Plaque de Chocolat Noir en forme d'une lettre",
-        description: "Cette plaque de chocolat prend la forme d'une lettre de votre choix. Merci d'indiquer cette lettre lors de votre commande. Cette plaque est également est disponible au chocolat au lait.",
-        price: 4.00,
-        image: "produit-4-tablette-lettre.jpg"
-    },
-    {
-        id: 5,
-        name: "Tablette au Chocolat Noir décorée d'une lettre",
-        description: "Sur cette tablette de chocolat est dessinée la lettre de votre choix, en chocolat blanc. Merci d'indiquer cette lettre lors de votre commande. Cette tablette est également disponible au chocolat au lait.",
-        price: 3.80,
-        image: "produit-5-tablette-decoree.jpg"
-    },
-    {
-        id: 6,
-        name: "Tablette Classique au Chocolat Noir ou Lait",
-        description: "Découvrez notre Tablette Classique au Chocolat Noir ou Lait.",
-        price: 2.10,
-        image: "produit-6-tablette-classique.jpg"
-    }
+    { id: 3, name: "Pâte à Tartiner", price: 5.00, image: "produit-3-pate-tartiner.jpg" },
+    { id: 4, name: "Plaque Lettre", price: 4.00, image: "produit-4-tablette-lettre.jpg" },
+    { id: 5, name: "Tablette décorée", price: 3.80, image: "produit-5-tablette-decoree.jpg" },
+    { id: 6, name: "Tablette Classique", price: 2.10, image: "produit-6-tablette-classique.jpg" }
 ];
 
-// ---------- PANIER ----------
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// PANIER
+let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-document.addEventListener('DOMContentLoaded', () => {
+// Affichage produits
+document.addEventListener("DOMContentLoaded", () => {
     renderProducts();
     updateCartCount();
     setupCartEvents();
 });
 
-// ---------- AFFICHAGE DES PRODUITS ----------
 function renderProducts() {
-    const productsGrid = document.getElementById('productsGrid');
-    if (!productsGrid) return;
-
-    productsGrid.innerHTML = products.map(product => {
-
-        if (product.isTruffes) {
+    const grid = document.getElementById("productsGrid");
+    grid.innerHTML = products.map(p => {
+        if (p.isTruffes) {
             return `
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}">
-                    </div>
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-
-                    <div class="product-price" id="price-${product.id}">
-                        ${product.truffesOptions[0].price.toFixed(2)} €
-                    </div>
-
-                    <div class="product-controls">
-                        <select id="truffes-option-${product.id}" onchange="updateTruffesPrice(${product.id})">
-                            ${product.truffesOptions.map(o => 
-                                `<option value="${o.quantity}" data-price="${o.price}">${o.quantity} truffes</option>`
-                            )}
-                        </select>
-
-                        <button onclick="addToCart(${product.id}, true)">Ajouter</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        return `
             <div class="product-card">
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}">
-                </div>
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-price">${product.price.toFixed(2)} €</div>
-
-                <div class="product-controls">
-                    <select id="qty-${product.id}">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-
-                    <button onclick="addToCart(${product.id})">Ajouter</button>
-                </div>
-            </div>
-        `;
-
-    }).join('');
+                <img src="${p.image}">
+                <h3>${p.name}</h3>
+                <p>${p.description}</p>
+                <select id="opt-${p.id}" onchange="updatePrice(${p.id})">
+                    ${p.truffesOptions.map(o => `<option value="${o.price}" data-q="${o.quantity}">${o.quantity} truffes</option>`)}
+                </select>
+                <div class="price" id="price-${p.id}">${p.truffesOptions[0].price} €</div>
+                <button onclick="addToCart(${p.id}, true)">Ajouter</button>
+            </div>`;
+        }
+        return `
+        <div class="product-card">
+            <img src="${p.image}">
+            <h3>${p.name}</h3>
+            <p>${p.description}</p>
+            <div>${p.price} €</div>
+            <button onclick="addToCart(${p.id})">Ajouter</button>
+        </div>`;
+    }).join("");
 }
 
-function updateTruffesPrice(productId) {
-    const select = document.getElementById(`truffes-option-${productId}`);
-    const price = select.options[select.selectedIndex].dataset.price;
-    document.getElementById(`price-${productId}`).textContent = parseFloat(price).toFixed(2) + " €";
+function updatePrice(id) {
+    let select = document.getElementById("opt-" + id);
+    document.getElementById("price-" + id).textContent = select.value + " €";
 }
 
-// ---------- AJOUT AU PANIER ----------
-function addToCart(productId, isTruffes = false) {
-    const product = products.find(p => p.id === productId);
+function addToCart(id, truffes = false) {
+    const product = products.find(p => p.id === id);
+    let itemName = product.name;
+    let price = product.price;
 
-    let itemName, quantity, price, key;
-
-    if (isTruffes) {
-        const select = document.getElementById(`truffes-option-${productId}`);
-        quantity = parseInt(select.value);
-        price = parseFloat(select.options[select.selectedIndex].dataset.price);
-        itemName = `${product.name} (${quantity} truffes)`;
-        key = `${productId}-${quantity}`;
-    } else {
-        quantity = parseInt(document.getElementById(`qty-${productId}`).value);
-        price = product.price;
-        itemName = product.name;
-        key = productId;
+    if (truffes) {
+        const sel = document.getElementById("opt-" + id);
+        price = parseFloat(sel.value);
+        const q = sel.options[sel.selectedIndex].dataset.q;
+        itemName += ` (${q} truffes)`;
     }
 
-    const existing = cart.find(item => item.key === key);
-
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({
-            key: key,
-            name: itemName,
-            price: price,
-            quantity: 1
-        });
-    }
-
+    cart.push({ name: itemName, price: price, quantity: 1 });
     saveCart();
     updateCartCount();
 }
 
 function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 function updateCartCount() {
-    document.getElementById('cartCount').textContent =
-        cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById("cartCount").textContent = cart.length;
 }
 
-// ---------- PANIER SIDEBAR ----------
+// PANIER SIDEBAR
 function setupCartEvents() {
-    const cartIcon = document.getElementById('cartIcon');
-    const sidebar = document.getElementById('cartSidebar');
-    const overlay = document.getElementById('overlay');
-
-    cartIcon.addEventListener('click', () => {
-        sidebar.classList.add('active');
-        overlay.classList.add('active');
+    document.getElementById("cartIcon").addEventListener("click", () => {
+        document.getElementById("cartSidebar").classList.add("active");
+        document.getElementById("overlay").classList.add("active");
         renderCartItems();
     });
 
-    document.getElementById('closeCart').addEventListener('click', closeCart);
-    overlay.addEventListener('click', closeCart);
+    document.getElementById("closeCart").addEventListener("click", closeCart);
+    document.getElementById("overlay").addEventListener("click", closeCart);
 
-    document.getElementById('btnOrder').addEventListener('click', () => {
-        if (cart.length === 0) return alert("Votre panier est vide");
-        openOrderModal();
+    document.getElementById("btnOrder").addEventListener("click", () => {
+        if (cart.length === 0) return alert("Panier vide");
+        document.getElementById("orderModal").classList.add("active");
     });
+
+    document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("orderModal").classList.remove("active");
+    });
+
+    document.getElementById("orderForm").addEventListener("submit", submitOrder);
 }
 
 function closeCart() {
-    document.getElementById('cartSidebar').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
+    document.getElementById("cartSidebar").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
 }
 
 function renderCartItems() {
-    const cartItems = document.getElementById('cartItems');
+    const container = document.getElementById("cartItems");
     if (cart.length === 0) {
-        cartItems.innerHTML = "<p class='empty-cart'>Votre panier est vide</p>";
-        document.getElementById('cartTotal').textContent = "0,00 €";
+        container.innerHTML = "<p>Panier vide</p>";
         return;
     }
-
-    cartItems.innerHTML = cart.map((item, index) => `
+    container.innerHTML = cart.map((item, i) => `
         <div class="cart-item">
-            <div>
-                <strong>${item.name}</strong><br>
-                ${item.quantity} × ${item.price.toFixed(2)} €
-            </div>
-            <button onclick="removeFromCart(${index})">❌</button>
+            ${item.name} — ${item.price}€
+            <button onclick="removeItem(${i})">X</button>
         </div>
-    `).join('');
-
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    document.getElementById('cartTotal').textContent = total.toFixed(2) + " €";
+    `).join("");
 }
 
-function removeFromCart(i) {
-    cart.splice(i, 1);
+function removeItem(index) {
+    cart.splice(index, 1);
     saveCart();
     renderCartItems();
     updateCartCount();
 }
 
-// ---------- COMMANDE ----------
-document.getElementById("orderForm").addEventListener("submit", function(e) {
+function submitOrder(e) {
     e.preventDefault();
 
     const order = {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        email: document.getElementById("email").value,
-        address: document.getElementById("address").value,
+        firstName: firstName.value,
+        lastName: lastName.value,
+        email: email.value,
+        address: address.value,
         cart: JSON.stringify(cart)
     };
 
@@ -245,6 +150,5 @@ document.getElementById("orderForm").addEventListener("submit", function(e) {
     cart = [];
     saveCart();
     updateCartCount();
-    renderCartItems();
-    closeOrderModal();
-});
+    document.getElementById("orderModal").classList.remove("active");
+}

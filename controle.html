@@ -3,92 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrôle - Jean Chocolatier</title>
+    <title>Panneau de Contrôle – Jean Chocolatier</title>
+
     <link rel="stylesheet" href="styles.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Script global (panier, etc.) -->
+    <script defer src="script.js"></script>
+
 </head>
+
 <body>
 
-<header>
-    <div class="header-content">
-        <span class="brand-name">Panneau de Contrôle</span>
-        <button onclick="logout()" class="logout-btn">Déconnexion</button>
-    </div>
-</header>
+    <!-- HEADER IDENTIQUE -->
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo">
+                <span class="brand-name">Jean Chocolatier</span>
+            </a>
 
-<main class="control-main">
-    <h1>Commandes et Messages</h1>
+            <nav>
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="contact.html" class="nav-link">Contact</a>
 
-    <h2>Commandes</h2>
-    <table class="control-table">
-        <thead>
-            <tr>
-                <th>Prénom</th><th>Nom</th><th>Email</th><th>Adresse</th><th>Panier</th>
-            </tr>
-        </thead>
-        <tbody id="ordersBody"></tbody>
-    </table>
+                <!-- Déconnexion admin -->
+                <a href="#" id="logoutBtn" class="nav-link">Déconnexion</a>
+            </nav>
+        </div>
+    </header>
 
-    <h2>Messages Contact</h2>
-    <table class="control-table">
-        <thead>
-            <tr>
-                <th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th>
-            </tr>
-        </thead>
-        <tbody id="messagesBody"></tbody>
-    </table>
-</main>
 
-<script>
-if (localStorage.getItem("adminLogged") !== "true") {
-    window.location.href = "login.html";
-}
+    <!-- PAGE CONTROLE -->
+    <main class="control-page">
 
-const supabase = window.supabase.createClient(
-    "https://opwjehlwkksuytrmdeii.supabase.co",
-    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
-);
+        <h1>Panneau de Contrôle</h1>
 
-async function loadOrders() {
-    const { data, error } = await supabase.from("orders").select("*");
-    if (error) return console.log(error);
+        <p class="admin-note">Bienvenue, administrateur. Voici les commandes et messages reçus.</p>
 
-    const tbody = document.getElementById("ordersBody");
-    tbody.innerHTML = data.map(order => `
-        <tr>
-            <td>${order.firstName}</td>
-            <td>${order.lastName}</td>
-            <td>${order.email}</td>
-            <td>${order.address}</td>
-            <td>${order.cart}</td>
-        </tr>
-    `).join("");
-}
 
-async function loadMessages() {
-    const { data, error } = await supabase.from("contact_messages").select("*");
-    if (error) return console.log(error);
+        <!-- COMMANDES -->
+        <section class="control-section">
+            <h2>Commandes</h2>
 
-    const tbody = document.getElementById("messagesBody");
-    tbody.innerHTML = data.map(msg => `
-        <tr>
-            <td>${msg.name}</td>
-            <td>${msg.email}</td>
-            <td>${msg.subject}</td>
-            <td>${msg.message}</td>
-        </tr>
-    `).join("");
-}
+            <button id="clearOrders" class="btn-clear">Effacer l’historique des commandes</button>
 
-loadOrders();
-loadMessages();
+            <table class="control-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Prénom</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Adresse</th>
+                        <th>Contenu du Panier</th>
+                        <th>Total (€)</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Commandes chargées via Supabase -->
+                </tbody>
+            </table>
+        </section>
 
-function logout(){
-    localStorage.removeItem("adminLogged");
-    window.location.href = "index.html";
-}
-</script>
+
+        <!-- MESSAGES CONTACT -->
+        <section class="control-section">
+            <h2>Messages de Contact</h2>
+
+            <button id="clearMessages" class="btn-clear">Effacer l’historique des messages</button>
+
+            <table class="control-table" id="messagesTable">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Sujet</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Messages chargés via Supabase -->
+                </tbody>
+            </table>
+        </section>
+
+
+    </main>
+
+
+    <!-- SCRIPT ADMIN + SUPABASE -->
+    <script>
+        // VERIFICATION ADMIN
+        if (localStorage.getItem("adminLogged") !== "true") {
+            window.location.href = "login.html";
+        }
+
+        // Déconnexion
+        document.getElementById("logoutBtn").addEventListener("click", function () {
+            localStorage.removeItem("adminLogged");
+            window.location.href = "login.html";
+        });
+
+        // SUPABASE CONFIG
+        const SUPABASE_URL = "https://opwjehlwkksuytrmdeii.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN";
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+        // RÉCUPÉRATION DES COMMANDES
+        async function loadOrders() {
+            const { data, error } = await client.from("orders").select("*").order("created_at", { ascending: false });
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const table = document.querySelector("#ordersTable tbody");
+            table.innerHTML = "";
+
+            data.forEach(order => {
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${order.firstName}</td>
+                    <td>${order.lastName}</td>
+                    <td>${order.email}</td>
+                    <td>${order.address}</td>
+                    <td>${order.cart}</td>
+                    <td>${order.total}</td>
+                    <td>${new Date(order.created_at).toLocaleString()}</td>
+                `;
+
+                table.appendChild(tr);
+            });
+        }
+
+
+        // RÉCUPÉRATION DES MESSAGES
+        async function loadMessages() {
+            const { data, error } = await client.from("contact_messages").select("*").order("created_at", { ascending: false });
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const table = document.querySelector("#messagesTable tbody");
+            table.innerHTML = "";
+
+            data.forEach(msg => {
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${msg.name}</td>
+                    <td>${msg.email}</td>
+                    <td>${msg.subject}</td>
+                    <td>${msg.message}</td>
+                    <td>${new Date(msg.created_at).toLocaleString()}</td>
+                `;
+
+                table.appendChild(tr);
+            });
+        }
+
+
+        // EFFACER HISTORIQUE COMMANDES
+        document.getElementById("clearOrders").addEventListener("click", async function () {
+            if (!confirm("Effacer toutes les commandes ?")) return;
+
+            const { error } = await client.from("orders").delete().neq("id", 0);
+            if (error) {
+                alert("Erreur lors de la suppression.");
+                return;
+            }
+
+            loadOrders();
+        });
+
+        // EFFACER HISTORIQUE MESSAGES
+        document.getElementById("clearMessages").addEventListener("click", async function () {
+            if (!confirm("Effacer tous les messages ?")) return;
+
+            const { error } = await client.from("contact_messages").delete().neq("id", 0);
+            if (error) {
+                alert("Erreur lors de la suppression.");
+                return;
+            }
+
+            loadMessages();
+        });
+
+
+        // CHARGE DONNÉES AU DEMARRAGE
+        loadOrders();
+        loadMessages();
+    </script>
 
 </body>
 </html>

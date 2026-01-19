@@ -3,47 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - Jean Chocolatier</title>
+    <title>Connexion – Jean Chocolatier</title>
+
     <link rel="stylesheet" href="styles.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase (si besoin dans le futur) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Script global -->
+    <script defer src="script.js"></script>
+
 </head>
+
 <body>
 
-<header>
-    <div class="header-content">
-        <a href="index.html" class="logo-container">
-            <span class="brand-name">Jean Chocolatier</span>
-        </a>
-    </div>
-</header>
+    <!-- HEADER IDENTIQUE -->
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo">
+                <span class="brand-name">Jean Chocolatier</span>
+            </a>
 
-<main class="login-main">
-    <h1>Connexion Admin</h1>
+            <nav>
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="login.html" class="nav-link">Connexion</a>
 
-    <form id="loginForm" class="login-form">
-        <label>Email :</label>
-        <input type="email" id="loginEmail" required>
+                <div class="cart-icon-container">
+                    <a href="#" class="cart-icon" id="cartIcon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-        <label>Mot de passe :</label>
-        <input type="password" id="loginPassword" required>
 
-        <button type="submit" class="btn-login">Se connecter</button>
-    </form>
-</main>
+    <!-- PAGE DE CONNEXION -->
+    <main class="login-page">
 
-<script>
-document.getElementById("loginForm").addEventListener("submit", function(e){
-    e.preventDefault();
+        <h1>Connexion Administrateur</h1>
 
-    if (loginEmail.value === "jean.chocolatier.site@gmail.com" &&
-        loginPassword.value === "Je=13716") {
+        <p class="login-info">
+            Accès réservé à l'administrateur du site.
+        </p>
 
-        localStorage.setItem("adminLogged", "true");
-        window.location.href = "controle.html";
-    } else {
-        alert("Identifiants incorrects");
-    }
-});
-</script>
+        <form id="loginForm" class="login-form">
+
+            <div class="form-group">
+                <label for="loginEmail">Adresse Email *</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Mot de Passe *</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+
+            <button type="submit" class="btn-login">Se connecter</button>
+
+        </form>
+
+    </main>
+
+
+    <script>
+        // IDENTIFIANTS ADMIN
+        const ADMIN_EMAIL = "jean.chocolatier.site@gmail.com";
+        const ADMIN_PASSWORD = "Je=13716";
+
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+
+                // Sauvegarde de l'état : connecté
+                localStorage.setItem("adminLogged", "true");
+
+                // Redirection
+                window.location.href = "controle.html";
+
+            } else {
+                alert("Identifiants incorrects.");
+            }
+        });
+    </script>
 
 </body>
 </html>

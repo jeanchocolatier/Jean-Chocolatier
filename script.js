@@ -1,3 +1,14 @@
+// ------------------------------------------
+// CONFIG SUPABASE
+// ------------------------------------------
+const SUPABASE_URL = "https://opwjehlwkksuytrmdeii.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+// ------------------------------------------
+// PRODUITS (D’ORIGINE)
+// ------------------------------------------
 const products = [
     {
         id: 1,
@@ -30,14 +41,14 @@ const products = [
     {
         id: 4,
         name: "Plaque de Chocolat Noir en forme d'une lettre",
-        description: "Cette plaque de chocolat prend la forme d'une lettre de votre choix...",
+        description: "Cette plaque de chocolat prend la forme d'une lettre de votre choix. Merci d'indiquer cette lettre lors de votre commande. Cette plaque est également est disponible au chocolat au lait.",
         price: 4.00,
         image: "produit-4-tablette-lettre.jpg"
     },
     {
         id: 5,
         name: "Tablette au Chocolat Noir décorée d'une lettre",
-        description: "Sur cette tablette de chocolat est dessinée la lettre de votre choix...",
+        description: "Sur cette tablette de chocolat est dessinée la lettre de votre choix, en chocolat blanc. Merci d'indiquer cette lettre lors de votre commande. Cette tablette est également disponible au chocolat au lait.",
         price: 3.80,
         image: "produit-5-tablette-decoree.jpg"
     },
@@ -50,14 +61,11 @@ const products = [
     }
 ];
 
-// SUPABASE
-const supabase = window.supabase.createClient(
-    "https://opwjehlwkksuytrmdeii.supabase.co",
-    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
-);
 
+// ------------------------------------------
 // PANIER
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// ------------------------------------------
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 document.addEventListener("DOMContentLoaded", () => {
     renderProducts();
@@ -65,73 +73,255 @@ document.addEventListener("DOMContentLoaded", () => {
     setupCartEvents();
 });
 
-// AFFICHAGE PRODUITS
+
+// ------------------------------------------
+// AFFICHAGE DES PRODUITS
+// ------------------------------------------
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <div class="product-image">
-                <img src="${p.image}">
-            </div>
-            <h3>${p.name}</h3>
-            <p>${p.description}</p>
-            <div class="product-price">${p.price.toFixed(2)} €</div>
+    if (!grid) return;
 
-            <div class="product-controls">
-                <select id="qty-${p.id}">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                </select>
+    grid.innerHTML = products.map(product => {
 
-                <button class="btn-add-cart" onclick="addToCart(${p.id})">
-                    Ajouter au panier
-                </button>
+        if (product.isTruffes) {
+            return `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}">
+                    </div>
+
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+
+                    <div class="product-price" id="price-${product.id}">
+                        ${product.truffesOptions[0].price.toFixed(2)} €
+                    </div>
+
+                    <div class="product-controls">
+                        <select id="truffes-option-${product.id}" onchange="updateTruffesPrice(${product.id})">
+                            ${product.truffesOptions.map(o =>
+                                `<option value="${o.quantity}" data-price="${o.price}">
+                                    ${o.quantity} truffes
+                                </option>`
+                            )}
+                        </select>
+
+                        <button class="btn-add-cart" onclick="addToCart(${product.id}, true)">
+                            Ajouter au panier
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </div>
+
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+
+                <div class="product-price">${product.price.toFixed(2)} €</div>
+
+                <div class="product-controls">
+                    <select id="qty-${product.id}">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+
+                    <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                        Ajouter au panier
+                    </button>
+                </div>
             </div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
-function addToCart(id) {
-    const p = products.find(x => x.id === id);
-    const qty = parseInt(document.getElementById(`qty-${id}`).value);
 
-    cart.push({
-        name: p.name,
-        price: p.price,
-        quantity: qty
-    });
+function updateTruffesPrice(productId) {
+    const select = document.getElementById(`truffes-option-${productId}`);
+    const price = select.options[select.selectedIndex].dataset.price;
+    document.getElementById(`price-${productId}`).textContent = parseFloat(price).toFixed(2) + " €";
+}
+
+
+// ------------------------------------------
+// AJOUT AU PANIER
+// ------------------------------------------
+function addToCart(productId, isTruffes = false) {
+    const product = products.find(p => p.id === productId);
+
+    let itemName, quantity, price, key;
+
+    if (isTruffes) {
+        const select = document.getElementById(`truffes-option-${productId}`);
+        quantity = parseInt(select.value);
+        price = parseFloat(select.options[select.selectedIndex].dataset.price);
+        itemName = `${product.name} (${quantity} truffes)`;
+        key = `${productId}-${quantity}`;
+    } else {
+        quantity = parseInt(document.getElementById(`qty-${productId}`).value);
+        price = product.price;
+        itemName = product.name;
+        key = productId;
+    }
+
+    const exists = cart.find(i => i.key === key);
+
+    if (exists) {
+        exists.quantity++;
+    } else {
+        cart.push({
+            key,
+            name: itemName,
+            price,
+            quantity: 1
+        });
+    }
 
     saveCart();
     updateCartCount();
 }
+
 
 function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// MODAL + ENVOI COMMANDES SUPABASE
-document.getElementById("orderForm").addEventListener("submit", async function(e){
-    e.preventDefault();
+function updateCartCount() {
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const badge = document.getElementById("cartCount");
+    if (badge) badge.textContent = count;
+}
 
-    const order = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        email: email.value,
-        address: address.value,
-        cart: JSON.stringify(cart)
-    };
 
-    const { error } = await supabase.from("orders").insert(order);
-    if (error) {
-        alert("Erreur lors de l'envoi !");
-        console.log(error);
+// ------------------------------------------
+// PANIER SIDEBAR
+// ------------------------------------------
+function setupCartEvents() {
+    const cartIcon = document.getElementById("cartIcon");
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("overlay");
+
+    if (cartIcon) {
+        cartIcon.addEventListener("click", () => {
+            sidebar.classList.add("active");
+            overlay.classList.add("active");
+            renderCartItems();
+        });
+    }
+
+    document.getElementById("closeCart").addEventListener("click", closeCart);
+    overlay.addEventListener("click", closeCart);
+
+    document.getElementById("btnOrder").addEventListener("click", () => {
+        if (cart.length === 0) return alert("Votre panier est vide");
+        openOrderModal();
+    });
+
+    document.getElementById("closeModal").addEventListener("click", closeOrderModal);
+}
+
+
+function closeCart() {
+    document.getElementById("cartSidebar").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
+
+function renderCartItems() {
+    const container = document.getElementById("cartItems");
+
+    if (cart.length === 0) {
+        container.innerHTML = "<p class='empty-cart'>Votre panier est vide</p>";
+        document.getElementById("cartTotal").textContent = "0,00 €";
         return;
     }
 
-    alert("Commande envoyée !");
+    container.innerHTML = cart.map((item, index) => `
+        <div class="cart-item">
+            <div>
+                <strong>${item.name}</strong><br>
+                ${item.quantity} × ${item.price.toFixed(2)} €
+            </div>
+
+            <button class="remove-item" onclick="removeFromCart(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join("");
+
+    const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+    document.getElementById("cartTotal").textContent = total.toFixed(2) + " €";
+}
+
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+    renderCartItems();
+    updateCartCount();
+}
+
+
+// ------------------------------------------
+// MODAL DE COMMANDE
+// ------------------------------------------
+function openOrderModal() {
+    document.getElementById("orderModal").classList.add("active");
+}
+
+function closeOrderModal() {
+    document.getElementById("orderModal").classList.remove("active");
+}
+
+
+// ------------------------------------------
+// ENVOI COMMANDE SUPABASE
+// ------------------------------------------
+document.getElementById("orderForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const address = document.getElementById("address").value.trim();
+
+    const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+
+    const cartString = cart.map(i => `${i.name} (x${i.quantity})`).join(", ");
+
+    const { error } = await supabaseClient.from("orders").insert({
+        firstName,
+        lastName,
+        email,
+        address,
+        cart: cartString,
+        total: total.toFixed(2),
+        created_at: new Date().toISOString()
+    });
+
+    if (error) {
+        console.error(error);
+        alert("Erreur lors de l'enregistrement de la commande.");
+        return;
+    }
+
+    alert("Commande envoyée avec succès !");
     cart = [];
     saveCart();
-    document.getElementById("orderModal").classList.remove("active");
     updateCartCount();
+    renderCartItems();
+    closeOrderModal();
 });
+const supabase = createClient(
+    "https://opwjehlwkksuytrmdeii.supabase.co",
+    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
+  );
+  

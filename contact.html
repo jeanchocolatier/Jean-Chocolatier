@@ -3,78 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Jean Chocolatier</title>
+    <title>Contact – Jean Chocolatier</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Script principal -->
+    <script defer src="script.js"></script>
 </head>
+
 <body>
 
-<header>
-    <div class="header-content">
-        <a href="index.html" class="logo-container">
-            <span class="brand-name">Jean Chocolatier</span>
-        </a>
-        <nav>
-            <a href="index.html">Accueil</a>
-            <a href="contact.html">Contact</a>
-            <a href="login.html">Connexion</a>
-            <a href="#" id="cartIcon"><i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span></a>
-        </nav>
-    </div>
-</header>
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo">
+                <span class="brand-name">Jean Chocolatier</span>
+            </a>
 
-<main class="contact-main">
-    <section class="contact-section">
+            <nav>
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="login.html" class="nav-link">Connexion</a>
+
+                <div class="cart-icon-container">
+                    <a href="#" class="cart-icon" id="cartIcon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- PAGE CONTACT -->
+    <main class="contact-page">
+
         <h1>Contactez-nous</h1>
 
-        <form id="contactForm">
+        <p class="contact-intro">
+            Une question, une demande spéciale ou simplement un message pour nous ?
+            Remplissez ce formulaire et nous vous répondrons rapidement.
+        </p>
 
-            <label>Nom :</label>
-            <input type="text" id="name" required>
+        <form id="contactForm" class="contact-form">
 
-            <label>Email :</label>
-            <input type="email" id="email" required>
+            <div class="form-group">
+                <label for="contactName">Nom *</label>
+                <input type="text" id="contactName" required>
+            </div>
 
-            <label>Sujet :</label>
-            <input type="text" id="subject" required>
+            <div class="form-group">
+                <label for="contactEmail">Email *</label>
+                <input type="email" id="contactEmail" required>
+            </div>
 
-            <label>Message :</label>
-            <textarea id="message" required></textarea>
+            <div class="form-group">
+                <label for="contactSubject">Sujet *</label>
+                <input type="text" id="contactSubject" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contactMessage">Message *</label>
+                <textarea id="contactMessage" rows="4" required></textarea>
+            </div>
 
             <button type="submit" class="btn-submit-contact">Envoyer</button>
+
         </form>
-    </section>
-</main>
 
-<script>
-const supabase = window.supabase.createClient(
-    "https://opwjehlwkksuytrmdeii.supabase.co",
-    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
-);
+    </main>
 
-document.getElementById("contactForm").addEventListener("submit", async function(e){
-    e.preventDefault();
 
-    const msg = {
-        name: name.value,
-        email: email.value,
-        subject: subject.value,
-        message: message.value
-    };
+    <script>
+        // Enregistrement du message dans Supabase
+        document.getElementById("contactForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
 
-    const { error } = await supabase.from("contact_messages").insert(msg);
+            const name = document.getElementById("contactName").value.trim();
+            const email = document.getElementById("contactEmail").value.trim();
+            const subject = document.getElementById("contactSubject").value.trim();
+            const message = document.getElementById("contactMessage").value.trim();
 
-    if (error) {
-        alert("Erreur lors de l'envoi !");
-        console.log(error);
-        return;
-    }
+            if (!name || !email || !subject || !message) {
+                alert("Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
 
-    alert("Message envoyé !");
-    this.reset();
-});
-</script>
+            // Connexion Supabase
+            const SUPABASE_URL = "https://opwjehlwkksuytrmdeii.supabase.co";
+            const SUPABASE_KEY = "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN";
+            const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // Enregistrement en base
+            const { error } = await client.from("contact_messages").insert({
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                created_at: new Date().toISOString()
+            });
+
+            if (error) {
+                console.error(error);
+                alert("Erreur lors de l'envoi du message.");
+                return;
+            }
+
+            alert("Message envoyé avec succès !");
+            document.getElementById("contactForm").reset();
+        });
+    </script>
 
 </body>
 </html>

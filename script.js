@@ -5,9 +5,8 @@ const SUPABASE_URL = "https://opwjehlwkksuytrmdeii.supabase.co";
 const SUPABASE_KEY = "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
 // ------------------------------------------
-// PRODUITS (D’ORIGINE)
+// PRODUITS (D’ORIGINE — INCHANGÉS)
 // ------------------------------------------
 const products = [
     {
@@ -61,7 +60,6 @@ const products = [
     }
 ];
 
-
 // ------------------------------------------
 // PANIER
 // ------------------------------------------
@@ -72,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
     setupCartEvents();
 });
-
 
 // ------------------------------------------
 // AFFICHAGE DES PRODUITS
@@ -103,11 +100,11 @@ function renderProducts() {
                                 `<option value="${o.quantity}" data-price="${o.price}">
                                     ${o.quantity} truffes
                                 </option>`
-                            )}
+                            ).join("")}
                         </select>
 
                         <button class="btn-add-cart" onclick="addToCart(${product.id}, true)">
-                            Ajouter au panier
+                            Ajouter au Panier
                         </button>
                     </div>
                 </div>
@@ -135,7 +132,7 @@ function renderProducts() {
                     </select>
 
                     <button class="btn-add-cart" onclick="addToCart(${product.id})">
-                        Ajouter au panier
+                        Ajouter au Panier
                     </button>
                 </div>
             </div>
@@ -143,13 +140,12 @@ function renderProducts() {
     }).join("");
 }
 
-
 function updateTruffesPrice(productId) {
     const select = document.getElementById(`truffes-option-${productId}`);
     const price = select.options[select.selectedIndex].dataset.price;
-    document.getElementById(`price-${productId}`).textContent = parseFloat(price).toFixed(2) + " €";
+    document.getElementById(`price-${productId}`).textContent =
+        parseFloat(price).toFixed(2) + " €";
 }
-
 
 // ------------------------------------------
 // AJOUT AU PANIER
@@ -177,18 +173,12 @@ function addToCart(productId, isTruffes = false) {
     if (exists) {
         exists.quantity++;
     } else {
-        cart.push({
-            key,
-            name: itemName,
-            price,
-            quantity: 1
-        });
+        cart.push({ key, name: itemName, price, quantity: 1 });
     }
 
     saveCart();
     updateCartCount();
 }
-
 
 function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -199,7 +189,6 @@ function updateCartCount() {
     const badge = document.getElementById("cartCount");
     if (badge) badge.textContent = count;
 }
-
 
 // ------------------------------------------
 // PANIER SIDEBAR
@@ -217,23 +206,21 @@ function setupCartEvents() {
         });
     }
 
-    document.getElementById("closeCart").addEventListener("click", closeCart);
-    overlay.addEventListener("click", closeCart);
+    document.getElementById("closeCart")?.addEventListener("click", closeCart);
+    overlay?.addEventListener("click", closeCart);
 
-    document.getElementById("btnOrder").addEventListener("click", () => {
+    document.getElementById("btnOrder")?.addEventListener("click", () => {
         if (cart.length === 0) return alert("Votre panier est vide");
         openOrderModal();
     });
 
-    document.getElementById("closeModal").addEventListener("click", closeOrderModal);
+    document.getElementById("closeModal")?.addEventListener("click", closeOrderModal);
 }
-
 
 function closeCart() {
     document.getElementById("cartSidebar").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
 }
-
 
 function renderCartItems() {
     const container = document.getElementById("cartItems");
@@ -250,9 +237,8 @@ function renderCartItems() {
                 <strong>${item.name}</strong><br>
                 ${item.quantity} × ${item.price.toFixed(2)} €
             </div>
-
             <button class="remove-item" onclick="removeFromCart(${index})">
-                <i class="fas fa-trash"></i>
+                🗑️
             </button>
         </div>
     `).join("");
@@ -261,7 +247,6 @@ function renderCartItems() {
     document.getElementById("cartTotal").textContent = total.toFixed(2) + " €";
 }
 
-
 function removeFromCart(index) {
     cart.splice(index, 1);
     saveCart();
@@ -269,9 +254,8 @@ function removeFromCart(index) {
     updateCartCount();
 }
 
-
 // ------------------------------------------
-// MODAL DE COMMANDE
+// MODAL COMMANDE
 // ------------------------------------------
 function openOrderModal() {
     document.getElementById("orderModal").classList.add("active");
@@ -281,35 +265,26 @@ function closeOrderModal() {
     document.getElementById("orderModal").classList.remove("active");
 }
 
-
 // ------------------------------------------
-// ENVOI COMMANDE SUPABASE
+// ENVOI COMMANDE → SUPABASE (TABLE orders)
 // ------------------------------------------
-document.getElementById("orderForm")?.addEventListener("submit", async function (e) {
+document.getElementById("orderForm")?.addEventListener("submit", async e => {
     e.preventDefault();
 
-    const firstName = document.getElementById("firstName").value.trim();
-    const lastName = document.getElementById("lastName").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const address = document.getElementById("address").value.trim();
-
-    const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-
-    const cartString = cart.map(i => `${i.name} (x${i.quantity})`).join(", ");
-
-    const { error } = await supabaseClient.from("orders").insert({
-        firstName,
-        lastName,
-        email,
-        address,
-        cart: cartString,
-        total: total.toFixed(2),
+    const orderData = {
+        first_name: firstName.value.trim(),
+        last_name: lastName.value.trim(),
+        email: email.value.trim(),
+        address: address.value.trim(),
+        cart_json: cart,
         created_at: new Date().toISOString()
-    });
+    };
+
+    const { error } = await supabaseClient.from("orders").insert(orderData);
 
     if (error) {
         console.error(error);
-        alert("Erreur lors de l'enregistrement de la commande.");
+        alert("Erreur lors de l'envoi de la commande.");
         return;
     }
 
@@ -320,8 +295,3 @@ document.getElementById("orderForm")?.addEventListener("submit", async function 
     renderCartItems();
     closeOrderModal();
 });
-const supabase = createClient(
-    "https://opwjehlwkksuytrmdeii.supabase.co",
-    "sb_publishable_MF0N_X53H4t7szkg_AJOAA_g0073LpN"
-  );
-  

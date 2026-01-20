@@ -2,139 +2,65 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <title>Jean Chocolatier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jean Chocolatier - Chocolats Artisanaux</title>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Icônes FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Script JS du site -->
-    <script defer src="script.js"></script>
 </head>
-
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <div class="header-content">
-            <a href="index.html" class="logo-container">
-                <img src="logo.png" alt="Logo Jean Chocolatier" class="logo">
-                <span class="brand-name">Jean Chocolatier</span>
-            </a>
-
-            <nav>
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-                <a href="login.html" class="nav-link">Connexion</a>
-
-                <div class="cart-icon-container">
-                    <a href="#" class="cart-icon" id="cartIcon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-
-    <!-- HERO / ACCUEIL -->
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Chocolats Artisanaux</h1>
-
-                <p class="hero-description">
-                    Découvrez l'art du chocolat fait maison. Chaque création est préparée avec passion 
-                    par Jean, à l'aide des meilleurs ingrédients, pour vous offrir une expérience 
-                    gustative unique. Plongez dans l'univers gourmand de Jean Chocolatier.
-                </p>
-            </div>
-        </section>
-
-
-        <!-- PRODUITS -->
-        <section class="products-section">
-            <h2>Nos Produits</h2>
-
-            <div class="products-grid" id="productsGrid">
-                <!-- Les produits sont injectés dynamiquement par script.js -->
-            </div>
-        </section>
-    </main>
-
-
-    <!-- SIDEBAR PANIER -->
-    <div class="cart-sidebar" id="cartSidebar">
-
-        <div class="cart-header">
-            <h2>Mon Panier</h2>
-
-            <button class="close-cart" id="closeCart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <div class="cart-items" id="cartItems">
-            <p class="empty-cart">Votre panier est vide</p>
-        </div>
-
-        <div class="cart-footer">
-            <div class="cart-total">
-                <strong>Total :</strong> <span id="cartTotal">0,00 €</span>
-            </div>
-
-            <button class="btn-order" id="btnOrder">Commander</button>
-        </div>
-
+<header>
+    <div class="header-content">
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" class="logo">
+            <span class="brand-name">Jean Chocolatier</span>
+        </a>
+        <nav>
+            <a href="index.html">Accueil</a>
+            <a href="contact.html">Contact</a>
+            <a href="login.html">Connexion</a>
+            <a href="#" id="cartIcon"><i class="fas fa-shopping-cart"></i> <span id="cartCount">0</span></a>
+        </nav>
     </div>
+</header>
 
-    <div class="overlay" id="overlay"></div>
+<section class="hero">
+    <h1>Chocolats Artisanaux</h1>
+    <p>
+        Découvrez l'art du chocolat fait maison. Chaque création est préparée avec passion par Jean, 
+        à l'aide des meilleurs ingrédients, pour vous offrir une expérience gustative unique. 
+        Plongez dans l'univers gourmand de Jean Chocolatier.
+    </p>
+</section>
 
+<section class="products-section">
+    <h2>Nos Produits</h2>
+    <div id="productsGrid" class="products-grid"></div>
+</section>
 
-    <!-- MODAL COMMANDE -->
-    <div class="order-modal" id="orderModal">
-        <div class="modal-content">
+<!-- PANIER -->
+<div id="cartSidebar" class="cart-sidebar">
+    <h2>Mon Panier</h2>
+    <div id="cartItems"></div>
+    <p>Total : <span id="cartTotal">0,00 €</span></p>
+    <button id="btnOrder">Commander</button>
+</div>
 
-            <div class="modal-header">
-                <h2>Finaliser votre commande</h2>
-                <button class="close-modal" id="closeModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+<div id="overlay"></div>
 
-            <form id="orderForm" class="order-form">
+<!-- MODAL COMMANDE -->
+<div id="orderModal" class="order-modal">
+    <form id="orderForm">
+        <h2>Finaliser la commande</h2>
+        <input id="firstName" placeholder="Prénom" required>
+        <input id="lastName" placeholder="Nom" required>
+        <input id="email" type="email" placeholder="Email" required>
+        <textarea id="address" placeholder="Adresse" required></textarea>
+        <button type="submit">Valider la commande</button>
+    </form>
+</div>
 
-                <div class="form-group">
-                    <label for="firstName">Prénom *</label>
-                    <input type="text" id="firstName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="lastName">Nom *</label>
-                    <input type="text" id="lastName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="address">Adresse *</label>
-                    <textarea id="address" rows="3" required></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit-order">Valider la commande</button>
-
-            </form>
-
-        </div>
-    </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
 </html>
